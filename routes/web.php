@@ -9,6 +9,12 @@ Route::get('/', function () {
 
 Route::prefix("api")->group(
     function () {
+        // users
         Route::post('/user', [UserController::class, 'create']);
+        Route::get("/user/all", [UserController::class, 'getAll']);
+
+        // players
+        Route::post("/player", [UserController::class, 'create']);
+        Route::get("/player/all", [UserController::class, 'getAll']);
     }
 );
