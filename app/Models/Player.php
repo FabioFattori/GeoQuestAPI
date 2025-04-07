@@ -2,17 +2,22 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Player extends Model
 {
-    
+    use HasFactory;
     protected $fillable = [
         'name',
         'level',
         'experienceCollected',
         'nWonBattles',
-        'nBattles'
+        'nBattles',
+        'helmetId',
+        'runeId',
+        'weaponId',
+        'currentHealth'
     ];
 
     protected $casts = [
@@ -22,10 +27,16 @@ class Player extends Model
         'nBattles' => 'integer'
     ];
 
+    protected $hidden = [
+        "createdAt",
+        "updatedAt"
+    ];
+
     protected $appends = ['experienceNeeded','damage','maxHealth'];
 
     private static function linearFunction($a,$b,$level)
     {
+        $level = max($level, 1);
         return ceil($a * $level + $b);
     }
 
@@ -41,6 +52,9 @@ class Player extends Model
 
     public function getExperienceNeededAttribute()
     {
+        if ($this->level <= 0) {
+            $this->level = 1; 
+        }
         $a = 50;
         $b = 150;
         $c = 500;
@@ -79,15 +93,5 @@ class Player extends Model
     public function getUsableItems()
     {
         return $this->hasMany(UsableItem::class, 'ownerId', 'id');
-    }
-
-    public function getUsableItemsByType($type)
-    {
-        return $this->hasMany(UsableItem::class, 'ownerId', 'id')->where('type', $type);
-    }
-
-    public function getUsableItemsByRarity($rarityId)
-    {
-        return $this->hasMany(UsableItem::class, 'ownerId', 'id')->where('rarityId', $rarityId);
     }
 }

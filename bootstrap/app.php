@@ -21,6 +21,20 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
+
+        $routesToSkip = [];
+
+        if(env('DEBUG', true)){
+            $routesToSkip = ["*"];
+        }else{
+            $routesToSkip = [
+                '/api/user', 
+                '/api/user/login',
+            ];
+        }
+
+        // Exclude CSRF for a specific route or URI
+        $middleware->validateCsrfTokens($routesToSkip);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

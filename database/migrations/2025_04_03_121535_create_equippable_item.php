@@ -18,11 +18,12 @@ return new class extends Migration
             $table->string("description");
             $table->integer("baseDamage");
             $table->integer("baseHealth");
+            $table->string("imagePath");
             $table->integer("requiredLevel");
             $table->float("randomFactor")->default(rand(0,2));
             // enum 'weapon', 'armor', 'rune' in Models/EquippableItemType.php
-            $table->enum('type', [EquippableItemType::WEAPON, EquippableItemType::ARMOR, EquippableItemType::RUNE]);
-            
+            $table->integer('type');
+            $table->timestamps();
         });
 
         Schema::create('equippableItems', function (Blueprint $table) {
@@ -31,10 +32,21 @@ return new class extends Migration
                 ->constrained('equippableItemBlueprints');
             $table->foreignId('rarityId')
                 ->constrained('rarities');
-            $table->integer('requiredLevel');
             $table->foreignId('ownerId')
                 ->constrained('players');
             $table->timestamps();
+        });
+
+        Schema::table("players",function(Blueprint $table){
+            $table->foreignId('helmetId')
+                ->nullable()
+                ->constrained('equippableItems');
+            $table->foreignId('runeId')
+                ->nullable()
+                ->constrained('equippableItems');
+            $table->foreignId('weaponId')
+                ->nullable()
+                ->constrained('equippableItems');
         });
     }
 

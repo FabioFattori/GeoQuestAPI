@@ -11,15 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('usableItems', function (Blueprint $table) {
+        Schema::create('usableItems_users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('description');
-            $table->foreignId('rarityId')
-                ->constrained('rarities');
-            $table->integer('healthRecovery');
-            $table->integer('damageAplifier');
-            $table->integer('durationInSeconds');
+            $table->foreignId('usableItemId')->constrained("usableItems")->onDelete('cascade');
+            $table->foreignId('ownerId')->constrained("players")->onDelete('cascade');
+            $table->integer('quantity')->default(1);
             $table->timestamps();
         });
     }
@@ -29,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('usableItems');
+        Schema::dropIfExists("usableItems_users");
     }
 };

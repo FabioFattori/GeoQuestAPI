@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Utils\TokenVerifier;
+use Auth;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Crypt;
@@ -9,20 +11,6 @@ use Illuminate\Support\Facades\Session;
 
 class UserController extends Controller
 {
-    /**
-     * @OA\Get(
-     *     path="/api/user",
-     *     summary="Get helloWorld",
-     *     @OA\Response(response="200", description="Success"),
-     *     security={{"bearerAuth":{}}}
-     * )
-     */
-    function index(Request $request)
-    {
-        return response()->json([
-            'message' => 'Hello, World!'
-        ]);
-    }
 
     /**
      * @OA\Post(
@@ -65,6 +53,7 @@ class UserController extends Controller
      *         @OA\JsonContent(
      *             @OA\Property(property="message", type="string", example="User created successfully"),
      *             @OA\Property(property="user", type="string"),
+     *             @OA\Property(property="player", type="string"),
      *             @OA\Property(property="token", type="string", example="csrf_token_value")
      *         )
      *     ),
@@ -79,20 +68,24 @@ class UserController extends Controller
      *     security={{"bearerAuth":{}}}
      * )
      */
-    public function create(Request $request) : \Illuminate\Http\JsonResponse
+    public function create(Request $request): \Illuminate\Http\JsonResponse
     {
         // Validazione dei dati in entrata
         $request->validate([
-            'playerName'=> ['required','string','max:255'],
+            'playerName' => ['required', 'string', 'max:255'],
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
         ]);
+
+        $playerCreationResponse = PlayerController::_create($request);
+
+        $id = $playerCreationResponse->getData(true)["player"]["id"];
 
         // Creazione del nuovo utente
         $user = User::create([
             'email' => $request->email,
             'password' => bcrypt($request->password),
-            'playerId' => PlayerController::_create($request)->player->id,
+            'playerId' => $id,
         ]);
 
         if ($user) {
@@ -104,7 +97,7 @@ class UserController extends Controller
             ]);
         } else {
             return response()->json([
-                'message'=> 'User creation failed',
+                'message' => 'User creation failed',
                 'errors' => [
                     'ERROR' => ['User creation failed'],
                 ],
@@ -134,9 +127,199 @@ class UserController extends Controller
      *   security={{"bearerAuth":{}}}
      * )
      */
-    public function getAll(Request $request) : \Illuminate\Http\JsonResponse
+    public function getAll(Request $request): \Illuminate\Http\JsonResponse
     {
+        $result = TokenVerifier::verifyTokenAndRespond();
+        if ($result != null) {
+            return $result;
+        }
         $users = User::all();
         return response()->json($users);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/user/{id}",
+     *     summary="Get user by ID",
+     *     description="Returns a user by ID",
+     *     operationId="getUserById",
+     *     tags={"User"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the user to retrieve",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User found",
+     *         @OA\JsonContent(
+     *            type="string",example="User string",)
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User not found"
+     *     ),
+     * )
+     */
+    public function getById(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $result = TokenVerifier::verifyTokenAndRespond();
+        if ($result != null) {
+            return $result;
+        }
+        $user = User::find($request->id);
+        if ($user) {
+            return response()->json($user);
+        } else {
+            return response()->json([
+                'message' => 'User not found',
+            ], 404);
+        }
+    }
+
+    /**
+     * @OA\Delete(
+     *     path="/api/user/{id}",
+     *     summary="Delete a user",
+     *     description="Deletes a user by ID",
+     *     operationId="deleteUser",
+     *     tags={"User"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the user to delete",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User deleted successfully"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User not found"
+     *     ),
+     * )
+     */
+    public function delete($id): \Illuminate\Http\JsonResponse
+    {
+        $result = TokenVerifier::verifyTokenAndRespond();
+        if ($result != null) {
+            return $result;
+        }
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'User not found',
+            ], 404);
+        }
+
+        $user->delete();
+
+        return response()->json([
+            'message' => 'User deleted successfully',
+        ]);
+    }
+    /**
+     * @OA\Post(
+     *     path="/api/user/logout",
+     *     summary="Logout user",
+     *     description="Logs out the user and invalidates the session",
+     *     tags={"User"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="User logged out successfully"
+     *     ),
+     * )
+     */
+    public function logout(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $result = TokenVerifier::verifyTokenAndRespond();
+        if ($result != null) {
+            return $result;
+        }
+
+        Auth::logout();
+ 
+        $request->session()->invalidate();
+    
+        $request->session()->regenerateToken();
+
+        return response()->json([
+            'message' => 'User logged out successfully',
+        ]);
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/user/login",
+     *     summary="Login User",
+     *     description="Autentica un utente esistente utilizzando email e password. Restituisce un token di autenticazione se la login ha successo.",
+     *     tags={"User"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 required={"email", "password"},
+     *                 @OA\Property(
+     *                     property="email",
+     *                     type="string",
+     *                     description="Email dell'utente",
+     *                     example="user@example.com"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="password",
+     *                     type="string",
+     *                     description="Password dell'utente",
+     *                     example="securePassword123"
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Login effettuato con successo",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="User logged in successfully"),
+     *             @OA\Property(property="token", type="string", description="Token di autenticazione")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Credenziali non valide",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Invalid credentials")
+     *         )
+     *     )
+     * )
+     */
+    public function login(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $result = TokenVerifier::verifyTokenAndRespond();
+        if ($result != null) {
+            return $result;
+        }
+        // Validazione dei dati in entrata
+        $request->validate([
+            'email' => 'required|string|email|max:255',
+            'password' => 'required|string|min:8',
+        ]);
+
+        // Autenticazione dell'utente
+        if (auth()->attempt($request->only('email', 'password'))) {
+            return response()->json([
+                'message' => 'User logged in successfully',
+                'token' => Crypt::encryptString(csrf_token()),
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Invalid credentials',
+            ], 401);
+        }
     }
 }

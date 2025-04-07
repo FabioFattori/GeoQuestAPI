@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class UsableItem extends Model
 {
+    use HasFactory;
+    protected $table = 'usableItems'; 
     protected $fillable = [
         'name',
         'description',
@@ -20,8 +23,15 @@ class UsableItem extends Model
         'damageAplifier' => 'integer',
     ];
 
-    public function getOwner()
+    public function getRarityAttribute()
     {
-        return $this->belongsTo(Player::class, 'ownerId', 'id');
+        return Rarity::find($this->rarityId);
+    }
+
+    public function players()
+    {
+        return $this->belongsToMany(Player::class, 'usable_items_users')
+            ->withPivot('quantity')
+            ->withTimestamps();
     }
 }

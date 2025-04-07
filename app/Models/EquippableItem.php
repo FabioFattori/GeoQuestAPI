@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class EquippableItem extends Model
 {
+    use HasFactory;
+    
+    protected $table = 'equippableItemBlueprints'; 
     protected $fillable = [
         'rarityId',
         'blueprintId',

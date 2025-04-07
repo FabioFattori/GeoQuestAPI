@@ -5,47 +5,806 @@
         "version": "1.0.0"
     },
     "paths": {
-        "/api/user": {
+        "/api/equippableItems": {
             "get": {
-                "summary": "Get helloWorld",
-                "operationId": "971db9bc974c0e607288cfe7ecc10096",
+                "tags": [
+                    "EquippableItems"
+                ],
+                "summary": "Get all equippable items",
+                "description": "Returns a list of all equippable items",
+                "operationId": "getAllEquippableItems",
                 "responses": {
                     "200": {
-                        "description": "Success"
+                        "description": "A list of equippable items",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "example": "equippableItems list stringify"
+                            }
+                        }
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             },
             "post": {
-                "summary": "create a new user",
-                "operationId": "7c2f70a3743c58ead609cd340889444b",
-                "parameters": [
-                    {
-                        "name": "email",
-                        "in": "query",
-                        "description": "User's email",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
+                "tags": [
+                    "EquippableItems"
+                ],
+                "summary": "Create a random equippable item",
+                "description": "Creates a random equippable item based on the given level and ownerId",
+                "operationId": "createRandomItem",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "level",
+                                    "ownerId"
+                                ],
+                                "properties": {
+                                    "level": {
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "ownerId": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Item created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "rarityId": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "blueprintId": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "ownerId": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "randomFactor": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 0.5
+                                        },
+                                        "damage": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 10.5
+                                        },
+                                        "health": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 20.5
+                                        },
+                                        "getRarity": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Rare"
+                                                },
+                                                "hexColor": {
+                                                    "type": "string",
+                                                    "example": "#FF0000"
+                                                },
+                                                "multiplier": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 1.5
+                                                },
+                                                "levelRequiredToDrop": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "getBlueprint": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Sword"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "A sharp sword"
+                                                },
+                                                "type": {
+                                                    "type": "string",
+                                                    "example": "weapon"
+                                                },
+                                                "baseDamage": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "baseHealth": {
+                                                    "type": "integer",
+                                                    "example": 20
+                                                },
+                                                "requiredLevel": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
                         }
                     },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "No available rarity or blueprint for the given level"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/equippableItems/{id}": {
+            "get": {
+                "tags": [
+                    "EquippableItems"
+                ],
+                "summary": "Get equippable item by ID",
+                "description": "Returns a single equippable item by its ID",
+                "operationId": "getEquippableItemById",
+                "parameters": [
                     {
-                        "name": "password",
-                        "in": "query",
-                        "description": "User's password",
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the equippable item",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "integer"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Success"
+                        "description": "Equippable item details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "example": "equippableItem details stringify"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/player": {
+            "post": {
+                "tags": [
+                    "Player"
+                ],
+                "summary": "Create a new player",
+                "description": "Creates a new player with a name",
+                "operationId": "createPlayer",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "playerName"
+                                ],
+                                "properties": {
+                                    "playerName": {
+                                        "description": "Player's name",
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Player created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Player created successfully"
+                                        },
+                                        "player": {
+                                            "type": "string",
+                                            "example": "stringified player object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/player/all": {
+            "get": {
+                "tags": [
+                    "Player"
+                ],
+                "summary": "Get all players",
+                "description": "Returns a list of all players",
+                "operationId": "getAllPlayers",
+                "responses": {
+                    "200": {
+                        "description": "A list of players",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "John Doe"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/player/{id}": {
+            "get": {
+                "tags": [
+                    "Player"
+                ],
+                "summary": "Get a player by ID",
+                "description": "Returns a player by ID",
+                "operationId": "getPlayerById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the player to retrieve",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Player found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "example": "Player stringified object"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Player not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Player"
+                ],
+                "summary": "Update a player",
+                "description": "Aggiorna le informazioni di un giocatore esistente, come nome, livello, esperienza raccolta, vittorie e battaglie totali.",
+                "operationId": "2bee51cc75979ae669cc1b18558f0986",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del giocatore da aggiornare",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "description": "Nuovo nome del giocatore",
+                                        "type": "string",
+                                        "example": "john doe"
+                                    },
+                                    "level": {
+                                        "description": "Nuovo livello del giocatore",
+                                        "type": "integer",
+                                        "example": 10
+                                    },
+                                    "experienceCollected": {
+                                        "description": "Esperienza raccolta dal giocatore",
+                                        "type": "integer",
+                                        "example": 1000
+                                    },
+                                    "nWonBattles": {
+                                        "description": "Numero di battaglie vinte dal giocatore",
+                                        "type": "integer",
+                                        "example": 50
+                                    },
+                                    "nBattles": {
+                                        "description": "Numero totale di battaglie del giocatore",
+                                        "type": "integer",
+                                        "example": 75
+                                    },
+                                    "helmetId": {
+                                        "description": "ID del casco equipaggiato dal giocatore",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "runeId": {
+                                        "description": "ID della runa equipaggiata dal giocatore",
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "weaponId": {
+                                        "description": "ID dell'arma equipaggiata dal giocatore",
+                                        "type": "integer",
+                                        "example": 3
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Giocatore aggiornato con successo",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Player updated successfully"
+                                        },
+                                        "player": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 22
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "john doe"
+                                                },
+                                                "level": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "experienceCollected": {
+                                                    "type": "integer",
+                                                    "example": 1000
+                                                },
+                                                "nWonBattles": {
+                                                    "type": "integer",
+                                                    "example": 50
+                                                },
+                                                "nBattles": {
+                                                    "type": "integer",
+                                                    "example": 75
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Giocatore non trovato",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Player not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Player"
+                ],
+                "summary": "Delete a player by ID",
+                "description": "Deletes a player by ID",
+                "operationId": "deletePlayerById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the player to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Player deleted successfully"
+                    },
+                    "404": {
+                        "description": "Player not found"
+                    }
+                }
+            }
+        },
+        "/api/rarities": {
+            "get": {
+                "tags": [
+                    "Rarities"
+                ],
+                "summary": "Get all rarities",
+                "description": "Returns a list of all rarities",
+                "operationId": "getAllRarities",
+                "responses": {
+                    "200": {
+                        "description": "A list of rarities",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "example": "rarities list stringify"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/usableItems/getUsableItemsOfUser": {
+            "get": {
+                "tags": [
+                    "UsableItems"
+                ],
+                "summary": "Ottieni gli oggetti utilizzabili di un giocatore",
+                "description": "Recupera gli oggetti utilizzabili per un giocatore specifico dato l'ID del proprietario.",
+                "operationId": "getUsableItemsOfUser",
+                "parameters": [
+                    {
+                        "name": "ownerId",
+                        "in": "query",
+                        "description": "ID del giocatore di cui ottenere gli oggetti utilizzabili.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista degli oggetti utilizzabili trovati per il giocatore.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "type": {
+                                                "type": "string"
+                                            },
+                                            "quantity": {
+                                                "type": "integer"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Errore nella richiesta: `ownerId` è richiesto.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "ownerId is required"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Giocatore non trovato con l'ID fornito.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Player not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/usableItems/createRandomUsableItem": {
+            "post": {
+                "tags": [
+                    "UsableItems"
+                ],
+                "summary": "Crea un oggetto utilizzabile casuale per un giocatore",
+                "description": "Genera e assegna un oggetto utilizzabile casuale a un giocatore in base al suo livello e alla rarità disponibile. Se l'oggetto esiste già, ne incrementa la quantità.",
+                "operationId": "createRandomUsableItems",
+                "requestBody": {
+                    "description": "Dati per creare un oggetto utilizzabile casuale",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "ownerId"
+                                ],
+                                "properties": {
+                                    "ownerId": {
+                                        "description": "ID del giocatore a cui assegnare l'oggetto utilizzabile",
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Oggetto utilizzabile casuale creato e assegnato con successo",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Random usable item created successfully"
+                                        },
+                                        "usableItem": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "type": {
+                                                    "type": "string"
+                                                },
+                                                "rarityId": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Errore nella richiesta: `ownerId` è richiesto.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "ownerId is required"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Giocatore non trovato o nessun oggetto utilizzabile trovato per la rarità specificata.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Player not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Create a new user",
+                "description": "Creates a new user with an email and password",
+                "operationId": "createUser",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password",
+                                    "playerName"
+                                ],
+                                "properties": {
+                                    "playerName": {
+                                        "description": "User's player name",
+                                        "type": "string",
+                                        "example": "Player123"
+                                    },
+                                    "email": {
+                                        "description": "User's email",
+                                        "type": "string",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "description": "User's password",
+                                        "type": "string",
+                                        "example": "Password123!"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User created successfully"
+                                        },
+                                        "user": {
+                                            "type": "string"
+                                        },
+                                        "player": {
+                                            "type": "string"
+                                        },
+                                        "token": {
+                                            "type": "string",
+                                            "example": "csrf_token_value"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -54,9 +813,206 @@
                     }
                 ]
             }
+        },
+        "/api/user/all": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get all users",
+                "description": "Returns a list of all users",
+                "operationId": "getAllUsers",
+                "responses": {
+                    "200": {
+                        "description": "A list of users",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/{id}": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get user by ID",
+                "description": "Returns a user by ID",
+                "operationId": "getUserById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the user to retrieve",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "example": "User string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Delete a user",
+                "description": "Deletes a user by ID",
+                "operationId": "deleteUser",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the user to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User deleted successfully"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            }
+        },
+        "/api/user/logout": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Logout user",
+                "description": "Logs out the user and invalidates the session",
+                "operationId": "d52b7004aad9cc11ac927b616ad9c1f2",
+                "responses": {
+                    "200": {
+                        "description": "User logged out successfully"
+                    }
+                }
+            }
+        },
+        "/api/user/login": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Login User",
+                "description": "Autentica un utente esistente utilizzando email e password. Restituisce un token di autenticazione se la login ha successo.",
+                "operationId": "9f6f4aca790a5229fb638e798623c6e0",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "description": "Email dell'utente",
+                                        "type": "string",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "description": "Password dell'utente",
+                                        "type": "string",
+                                        "example": "securePassword123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login effettuato con successo",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User logged in successfully"
+                                        },
+                                        "token": {
+                                            "description": "Token di autenticazione",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Credenziali non valide",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invalid credentials"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
+        "responses": {
+            "200": {
+                "description": "A list of usable items",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "usableItems list stringify"
+                    }
+                }
+            }
+        },
         "securitySchemes": {
             "bearerAuth": {
                 "type": "http",
@@ -64,5 +1020,27 @@
                 "scheme": "bearer"
             }
         }
-    }
+    },
+    "tags": [
+        {
+            "name": "EquippableItems",
+            "description": "EquippableItems"
+        },
+        {
+            "name": "Player",
+            "description": "Player"
+        },
+        {
+            "name": "Rarities",
+            "description": "Rarities"
+        },
+        {
+            "name": "UsableItems",
+            "description": "UsableItems"
+        },
+        {
+            "name": "User",
+            "description": "User"
+        }
+    ]
 }

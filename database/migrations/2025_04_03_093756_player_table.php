@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->string("hexColor");
             $table->float('multiplier')->default(1);
+            // the level required to drop an item of this rarity
+            $table->integer('levelRequiredToDrop')->default(1);
             $table->timestamps();
         });
 
