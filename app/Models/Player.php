@@ -94,4 +94,10 @@ class Player extends Model
     {
         return $this->hasMany(UsableItem::class, 'ownerId', 'id');
     }
+
+    public static function getPlayerToReturnById($id)
+{
+    return self::find($id);
+}
+
 }

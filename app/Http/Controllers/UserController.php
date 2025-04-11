@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Player;
 use Auth;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -98,9 +99,9 @@ class UserController extends Controller
             // Risposta JSON
             return response()->json([
                 'message' => 'User created successfully',
-                'user' => json_encode($userToReturn),
+                'user' => $userToReturn,
                 'token' =>  $user->createToken("userToken",["Auth"])->plainTextToken,
-                'player' => json_encode($player),
+                'player' => Player::getPlayerToReturnById($id),
             ]);
         } else {
             return response()->json([
@@ -303,6 +304,12 @@ class UserController extends Controller
             return response()->json([
                 'message' => 'User logged in successfully',
                 'token' => $user->createToken("userToken",["Auth"])->plainTextToken,
+                'player' => Player::getPlayerToReturnById($user->playerId), JSON_UNESCAPED_UNICODE,
+                'user' => [
+                    'id' => $user->id,
+                    'email' => $user->email,
+                    'playerId' => $user->playerId,
+                ],
             ]);
         } else {
             return response()->json([
