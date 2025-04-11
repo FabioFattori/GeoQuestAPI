@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Utils\TokenVerifier;
 use App\Models\Player;
 use App\Models\Rarity;
 use Illuminate\Http\JsonResponse;
@@ -27,10 +26,6 @@ class UsableItemController extends Controller
      */
     public function getAll(): JsonResponse
     {
-        $r = TokenVerifier::verifyTokenAndRespond();
-        if ($r) {
-            return $r;
-        }
         return response()->json(UsableItem::all(), 200);
     }
 
@@ -84,10 +79,6 @@ class UsableItemController extends Controller
      */
     public function getUsableItemsOfUser(Request $request): JsonResponse
     {
-        $r = TokenVerifier::verifyTokenAndRespond();
-        if ($r) {
-            return $r;
-        }
         $userId = $request->input('ownerId');
         if (!$userId) {
             return response()->json(['error' => 'ownerId is required'], 400);
@@ -146,11 +137,6 @@ class UsableItemController extends Controller
      */
     public function createRandomItem(Request $request): JsonResponse
     {
-        $r = TokenVerifier::verifyTokenAndRespond();
-        if ($r) {
-            return $r;
-        }
-
         $request->validate([
             'ownerId' => 'required|integer',
         ]);

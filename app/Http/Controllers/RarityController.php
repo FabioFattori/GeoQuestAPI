@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Utils\TokenVerifier;
 use Illuminate\Http\Request;
 
 class RarityController extends Controller
@@ -23,10 +22,6 @@ class RarityController extends Controller
      */
     public function getAll()
     {
-        $r = TokenVerifier::verifyTokenAndRespond();
-        if ($r) {
-            return $r;
-        }
         return response()->json( \App\Models\Rarity::all());
     }
 }

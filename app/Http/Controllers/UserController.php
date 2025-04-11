@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Utils\TokenVerifier;
 use Auth;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -79,7 +78,8 @@ class UserController extends Controller
 
         $playerCreationResponse = PlayerController::_create($request);
 
-        $id = $playerCreationResponse->getData(true)["player"]["id"];
+        $player = $playerCreationResponse->getData(true)["player"];
+        $id = $player["id"];
 
         // Creazione del nuovo utente
         $user = User::create([
@@ -88,12 +88,19 @@ class UserController extends Controller
             'playerId' => $id,
         ]);
 
+        $userToReturn = [
+            'id' => $user->id,
+            'email' => $user->email,
+            'player' => $user->playerId,
+        ];
+
         if ($user) {
             // Risposta JSON
             return response()->json([
                 'message' => 'User created successfully',
-                'user' => json_encode($user),
-                'token' => Crypt::encryptString(csrf_token()),
+                'user' => json_encode($userToReturn),
+                'token' =>  $user->createToken("userToken",["Auth"])->plainTextToken,
+                'player' => json_encode($player),
             ]);
         } else {
             return response()->json([
@@ -129,10 +136,6 @@ class UserController extends Controller
      */
     public function getAll(Request $request): \Illuminate\Http\JsonResponse
     {
-        $result = TokenVerifier::verifyTokenAndRespond();
-        if ($result != null) {
-            return $result;
-        }
         $users = User::all();
         return response()->json($users);
     }
@@ -165,10 +168,6 @@ class UserController extends Controller
      */
     public function getById(Request $request): \Illuminate\Http\JsonResponse
     {
-        $result = TokenVerifier::verifyTokenAndRespond();
-        if ($result != null) {
-            return $result;
-        }
         $user = User::find($request->id);
         if ($user) {
             return response()->json($user);
@@ -205,10 +204,6 @@ class UserController extends Controller
      */
     public function delete($id): \Illuminate\Http\JsonResponse
     {
-        $result = TokenVerifier::verifyTokenAndRespond();
-        if ($result != null) {
-            return $result;
-        }
         $user = User::find($id);
 
         if (!$user) {
@@ -237,11 +232,6 @@ class UserController extends Controller
      */
     public function logout(Request $request): \Illuminate\Http\JsonResponse
     {
-        $result = TokenVerifier::verifyTokenAndRespond();
-        if ($result != null) {
-            return $result;
-        }
-
         Auth::logout();
  
         $request->session()->invalidate();
@@ -300,10 +290,6 @@ class UserController extends Controller
      */
     public function login(Request $request): \Illuminate\Http\JsonResponse
     {
-        $result = TokenVerifier::verifyTokenAndRespond();
-        if ($result != null) {
-            return $result;
-        }
         // Validazione dei dati in entrata
         $request->validate([
             'email' => 'required|string|email|max:255',
@@ -312,9 +298,11 @@ class UserController extends Controller
 
         // Autenticazione dell'utente
         if (auth()->attempt($request->only('email', 'password'))) {
+            $user = auth()->user();
+            
             return response()->json([
                 'message' => 'User logged in successfully',
-                'token' => Crypt::encryptString(csrf_token()),
+                'token' => $user->createToken("userToken",["Auth"])->plainTextToken,
             ]);
         } else {
             return response()->json([

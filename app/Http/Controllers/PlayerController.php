@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Utils\TokenVerifier;
 use Illuminate\Http\Request;
 use App\Models\Player;
 use App\Models\Enums\EquippableItemType;
@@ -86,11 +85,6 @@ class PlayerController extends Controller
      */
     public function getAll(): \Illuminate\Http\JsonResponse
     {
-        $result = TokenVerifier::verifyTokenAndRespond();
-        if ($result != null) {
-            return $result;
-        }
-
         $players = Player::all();
         return response()->json(
             $players
@@ -126,11 +120,6 @@ class PlayerController extends Controller
      */
     public function getById($id): \Illuminate\Http\JsonResponse
     {
-        $result = TokenVerifier::verifyTokenAndRespond();
-        if ($result != null) {
-            return $result;
-        }
-
         $player = Player::find($id);
 
         if (!$player) {
@@ -168,10 +157,6 @@ class PlayerController extends Controller
      */
     public function delete($id): \Illuminate\Http\JsonResponse
     {
-        $result = TokenVerifier::verifyTokenAndRespond();
-        if ($result != null) {
-            return $result;
-        }
 
         $player = Player::find($id);
 
@@ -285,10 +270,6 @@ class PlayerController extends Controller
      */
     public function update(Request $request, $id): \Illuminate\Http\JsonResponse
     {
-        $result = TokenVerifier::verifyTokenAndRespond();
-        if ($result != null) {
-            return $result;
-        }
 
         $player = Player::find($id);
 

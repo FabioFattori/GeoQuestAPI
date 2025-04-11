@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Utils\TokenVerifier;
 use App\Models\EquippableItemBlueprint;
 use App\Models\EquippableItem;
 use App\Models\Rarity;
@@ -27,10 +26,6 @@ class EquippableItemsController extends Controller
      */
     public function getAll()
     {
-        $r = TokenVerifier::verifyTokenAndRespond();
-        if ($r) {
-            return $r;
-        }
         return response()->json(EquippableItem::all());
     }
 
@@ -57,10 +52,6 @@ class EquippableItemsController extends Controller
      */
     public function getById($id)
     {
-        $r = TokenVerifier::verifyTokenAndRespond();
-        if ($r) {
-            return $r;
-        }
         return response()->json(EquippableItem::find($id));
     }
 
@@ -127,11 +118,6 @@ class EquippableItemsController extends Controller
      */
     public function createRandomItem(Request $request) : JsonResponse
     {
-        $r = TokenVerifier::verifyTokenAndRespond();
-        if ($r) {
-            return $r;
-        }
-
         $request->validate([
             'level' => 'required|integer|min:1',
             'ownerId' => 'required|integer|exists:players,id',
