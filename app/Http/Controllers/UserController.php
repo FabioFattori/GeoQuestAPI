@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Session;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class UserController extends Controller
 {
@@ -318,6 +319,66 @@ class UserController extends Controller
         }
     }
 
+    /**
+ * @OA\Post(
+ *     path="/api/user/checkToken",
+ *     summary="Verifica il token dell'utente",
+ *     description="Controlla se il token fornito corrisponde a quello salvato per l'utente specificato.",
+ *     tags={"User"},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\MediaType(
+ *             mediaType="application/json",
+ *             @OA\Schema(
+ *                 type="object",
+ *                 required={"email", "token"},
+ *                 @OA\Property(
+ *                     property="email",
+ *                     type="string",
+ *                     format="email",
+ *                     description="Email dell'utente",
+ *                     example="user@example.com"
+ *                 ),
+ *                 @OA\Property(
+ *                     property="token",
+ *                     type="string",
+ *                     description="Token da verificare",
+ *                     example="abc123xyz"
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Token valido",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="logged in")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=403,
+ *         description="Token non valido",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="unauthenticated")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Utente non trovato",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="not found")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=422,
+ *         description="Dati non validi",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="The given data was invalid.")
+ *         )
+ *     )
+ * )
+ */
+
     public function checkToken (Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
@@ -331,11 +392,12 @@ class UserController extends Controller
                     'message'=> 'not found',
                     ],404);
                 }
-                if ($user->token != $request->token) {
-                    return response()->json([
-                        'message'=> 'unauthenticated',
-                    ],403);
-                }
+
+                $accessToken = PersonalAccessToken::findToken($request->token);
+
+if (!$accessToken || $accessToken->tokenable->email !== $request->email) {
+    return response()->json(['message' => 'unauthenticated'], 403);
+}
 
                 return response()->json([
                     "message" => "logged in"
