@@ -20,6 +20,7 @@ Route::prefix("api")->group(
         Route::delete("/user/{id}", [UserController::class, 'delete']);
         Route::post("/user/login", [UserController::class, 'login']);
         Route::post("/user/logout", [UserController::class, 'logout']);
+        Route::post("/user/checkToken",[UserController::class,"checkToken"]);
 
         // players
         Route::post("/player", [PlayerController::class, 'create']);

@@ -317,4 +317,28 @@ class UserController extends Controller
             ], 401);
         }
     }
+
+    public function checkToken (Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'email' => ["email","required","string"],
+            'token'=> ['required','string'],
+            ]);
+
+            $user = User::where('email', $request->email)->first();
+            if (empty($user)) {
+                return response()->json([
+                    'message'=> 'not found',
+                    ],404);
+                }
+                if ($user->token != $request->token) {
+                    return response()->json([
+                        'message'=> 'unauthenticated',
+                    ],403);
+                }
+
+                return response()->json([
+                    "message" => "logged in"
+                ],200);
+    }
 }
