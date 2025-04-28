@@ -41,5 +41,6 @@ Route::prefix("api")->group(
         Route::get("/usableItems/getAll", [UsableItemController::class, 'getAll']);
         Route::get("/usableItems/getUsableItemsOfUser", [UsableItemController::class, 'getUsableItemsOfUser']);
         Route::post("/usableItems/createRandomUsableItem", [UsableItemController::class, 'createRandomItem']);
+        Route::get('/usableItems/getAll', [UsableItemController::class,'getAll']);
     }
 )->middleware(['auth:sanctum']);

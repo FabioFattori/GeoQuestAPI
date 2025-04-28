@@ -234,11 +234,11 @@ class UserController extends Controller
      */
     public function logout(Request $request): \Illuminate\Http\JsonResponse
     {
-        Auth::logout();
- 
-        $request->session()->invalidate();
-    
-        $request->session()->regenerateToken();
+        $user = $request->user(); // Ottiene l'utente autenticato tramite il token
+
+        if ($user) {
+            $user->currentAccessToken()->delete(); // Elimina solo il token attivo
+        }
 
         return response()->json([
             'message' => 'User logged out successfully',

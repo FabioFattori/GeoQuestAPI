@@ -35,12 +35,14 @@ class EquippableItemBlueprint extends Model
         return EquippableItemBlueprint::where('requiredLevel', '<=', $level)->get();
     }
 
-    public static function createEquippableItem($rarityId,$blueprintId,$ownerId)
+    public static function createEquippableItem($rarityId,$blueprintId,$ownerId = null)
     {
         $equippableItem = new EquippableItem();
         $equippableItem->rarityId = $rarityId;
         $equippableItem->blueprintId = $blueprintId;
-        $equippableItem->ownerId = $ownerId;
+        if($ownerId){        
+            $equippableItem->ownerId = $ownerId;
+        }
         $equippableItem->save();
 
         return $equippableItem;

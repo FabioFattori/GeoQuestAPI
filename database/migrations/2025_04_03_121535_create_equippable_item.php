@@ -33,7 +33,7 @@ return new class extends Migration
             $table->foreignId('rarityId')
                 ->constrained('rarities');
             $table->foreignId('ownerId')
-                ->constrained('players');
+                ->constrained('players')->nullable();
             $table->timestamps();
         });
 

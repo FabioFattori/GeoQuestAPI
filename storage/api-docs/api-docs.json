@@ -628,9 +628,9 @@
                 "tags": [
                     "UsableItems"
                 ],
-                "summary": "Crea un oggetto utilizzabile casuale per un giocatore",
-                "description": "Genera e assegna un oggetto utilizzabile casuale a un giocatore in base al suo livello e alla rarità disponibile. Se l'oggetto esiste già, ne incrementa la quantità.",
-                "operationId": "createRandomUsableItems",
+                "summary": "Crea un oggetto utilizzabile casuale",
+                "description": "Genera un oggetto utilizzabile casuale in base al livello specificato. Se viene fornito ownerId, assegna l'oggetto al giocatore. Altrimenti, l'oggetto non sarà assegnato a nessuno.",
+                "operationId": "createRandomUsableItem",
                 "requestBody": {
                     "description": "Dati per creare un oggetto utilizzabile casuale",
                     "required": true,
@@ -638,12 +638,17 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "ownerId"
+                                    "level"
                                 ],
                                 "properties": {
-                                    "ownerId": {
-                                        "description": "ID del giocatore a cui assegnare l'oggetto utilizzabile",
+                                    "level": {
+                                        "description": "Livello del giocatore per determinare la rarità dell'oggetto",
                                         "type": "integer"
+                                    },
+                                    "ownerId": {
+                                        "description": "ID del giocatore a cui assegnare l'oggetto (opzionale)",
+                                        "type": "integer",
+                                        "nullable": true
                                     }
                                 },
                                 "type": "object"
@@ -653,7 +658,7 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Oggetto utilizzabile casuale creato e assegnato con successo",
+                        "description": "Oggetto utilizzabile casuale creato con successo",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -670,11 +675,21 @@
                                                 "name": {
                                                     "type": "string"
                                                 },
-                                                "type": {
+                                                "description": {
+                                                    "type": "string"
+                                                },
+                                                "healthRecovery": {
+                                                    "type": "integer"
+                                                },
+                                                "imagePath": {
                                                     "type": "string"
                                                 },
                                                 "rarityId": {
                                                     "type": "integer"
+                                                },
+                                                "ownerId": {
+                                                    "type": "integer",
+                                                    "nullable": true
                                                 }
                                             },
                                             "type": "object"
@@ -685,15 +700,15 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Errore nella richiesta: `ownerId` è richiesto.",
+                    "422": {
+                        "description": "Errore di validazione: campo richiesto mancante o non valido",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "error": {
+                                        "message": {
                                             "type": "string",
-                                            "example": "ownerId is required"
+                                            "example": "The level field is required."
                                         }
                                     },
                                     "type": "object"
@@ -702,7 +717,7 @@
                         }
                     },
                     "404": {
-                        "description": "Giocatore non trovato o nessun oggetto utilizzabile trovato per la rarità specificata.",
+                        "description": "Giocatore non trovato o nessun oggetto utilizzabile disponibile per la rarità specificata.",
                         "content": {
                             "application/json": {
                                 "schema": {

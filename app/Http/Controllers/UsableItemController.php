@@ -90,84 +90,98 @@ class UsableItemController extends Controller
         return response()->json($player->usableItems, 200);
     }
 
-    /**
+        /**
      * @OA\Post(
      *     path="/api/usableItems/createRandomUsableItem",
-     *     summary="Crea un oggetto utilizzabile casuale per un giocatore",
-     *     description="Genera e assegna un oggetto utilizzabile casuale a un giocatore in base al suo livello e alla rarità disponibile. Se l'oggetto esiste già, ne incrementa la quantità.",
-     *     operationId="createRandomUsableItems",
+     *     summary="Crea un oggetto utilizzabile casuale",
+     *     description="Genera un oggetto utilizzabile casuale in base al livello specificato. Se viene fornito ownerId, assegna l'oggetto al giocatore. Altrimenti, l'oggetto non sarà assegnato a nessuno.",
+     *     operationId="createRandomUsableItem",
      *     tags={"UsableItems"},
      *     @OA\RequestBody(
      *         required=true,
      *         description="Dati per creare un oggetto utilizzabile casuale",
      *         @OA\JsonContent(
-     *             required={"ownerId"},
-     *             @OA\Property(property="ownerId", type="integer", description="ID del giocatore a cui assegnare l'oggetto utilizzabile")
+     *             required={"level"},
+     *             @OA\Property(property="level", type="integer", description="Livello del giocatore per determinare la rarità dell'oggetto"),
+     *             @OA\Property(property="ownerId", type="integer", nullable=true, description="ID del giocatore a cui assegnare l'oggetto (opzionale)")
      *         )
      *     ),
      *     @OA\Response(
      *         response=201,
-     *         description="Oggetto utilizzabile casuale creato e assegnato con successo",
+     *         description="Oggetto utilizzabile casuale creato con successo",
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="message", type="string", example="Random usable item created successfully"),
      *             @OA\Property(property="usableItem", type="object", 
      *                 @OA\Property(property="id", type="integer"),
      *                 @OA\Property(property="name", type="string"),
-     *                 @OA\Property(property="type", type="string"),
-     *                 @OA\Property(property="rarityId", type="integer")
+     *                 @OA\Property(property="description", type="string"),
+     *                 @OA\Property(property="healthRecovery", type="integer"),
+     *                 @OA\Property(property="imagePath", type="string"),
+     *                 @OA\Property(property="rarityId", type="integer"),
+     *                 @OA\Property(property="ownerId", type="integer", nullable=true)
      *             )
      *         )
      *     ),
      *     @OA\Response(
-     *         response=400,
-     *         description="Errore nella richiesta: `ownerId` è richiesto.",
+     *         response=422,
+     *         description="Errore di validazione: campo richiesto mancante o non valido",
      *         @OA\JsonContent(
-     *             @OA\Property(property="error", type="string", example="ownerId is required")
+     *             @OA\Property(property="message", type="string", example="The level field is required.")
      *         )
      *     ),
      *     @OA\Response(
      *         response=404,
-     *         description="Giocatore non trovato o nessun oggetto utilizzabile trovato per la rarità specificata.",
+     *         description="Giocatore non trovato o nessun oggetto utilizzabile disponibile per la rarità specificata.",
      *         @OA\JsonContent(
      *             @OA\Property(property="error", type="string", example="Player not found"),
      *         )
      *     )
      * )
      */
+
     public function createRandomItem(Request $request): JsonResponse
     {
         $request->validate([
-            'ownerId' => 'required|integer',
+            'level' => 'required|integer',
+            'ownerId' => 'nullable|integer',
         ]);
-
-        $player = Player::find($request->input('ownerId'));
-        if ($player->count() == 0) {
-            return response()->json(['error' => 'Player not found'], 404);
+    
+        $player = null;
+        if ($request->filled('ownerId')) {
+            $player = Player::find($request->input('ownerId'));
+    
+            if (!$player) {
+                return response()->json(['error' => 'Player not found'], 404);
+            }
         }
-        $player = $player->first();
-
-        $randomRarity = Rarity::getPossibleRaritiesGivenLevel($player->level)->random();
-        $randomUsableItem = UsableItem::where('rarityId', $randomRarity->id)->inRandomOrder();
-        if ($randomUsableItem->count() == 0 || $randomUsableItem->count() == 0) {
+    
+        // Estrai una rarità compatibile col livello passato
+        $randomRarity = Rarity::getPossibleRaritiesGivenLevel($request->input('level'))->random();
+    
+        // Prendi un UsableItem casuale con quella rarità
+        $randomUsableItemTemplate = UsableItem::where('rarityId', $randomRarity->id)
+            ->inRandomOrder()
+            ->first();
+    
+        if (!$randomUsableItemTemplate) {
             return response()->json(['error' => 'No usable items found for the given rarity'], 404);
         }
-        $randomUsableItem = $randomUsableItem->first();
-        $randomUsableItem = $randomUsableItem->first();
-
-        // Check if the player already has the item
-        $existingItem = $player->usableItems()->where('id', $randomUsableItem->id)->first();
-        if ($existingItem) {
-            // If the item already exists, increment the quantity
-            $existingItem->pivot->quantity++;
-            $existingItem->pivot->save();
-        } else {
-            // If the item doesn't exist, attach it to the player with quantity 1
-            $player->usableItems()->attach($randomUsableItem->id, ['quantity' => 1]);
-        }
+    
+        // Crea una nuova istanza di usableItem, assegnandola eventualmente al player
+        $newUsableItem = UsableItem::create([
+            'name' => $randomUsableItemTemplate->name,
+            'description' => $randomUsableItemTemplate->description,
+            'healthRecovery' => $randomUsableItemTemplate->healthRecovery,
+            'imagePath' => $randomUsableItemTemplate->imagePath,
+            'rarityId' => $randomUsableItemTemplate->rarityId,
+            'ownerId' => $player ? $player->id : null,
+        ]);
+    
         return response()->json([
             'message' => 'Random usable item created successfully',
-            'usableItem' => $randomUsableItem,
+            'usableItem' => $newUsableItem,
         ], 201);
     }
+
 }

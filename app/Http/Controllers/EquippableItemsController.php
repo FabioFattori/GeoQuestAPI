@@ -120,7 +120,7 @@ class EquippableItemsController extends Controller
     {
         $request->validate([
             'level' => 'required|integer|min:1',
-            'ownerId' => 'required|integer|exists:players,id',
+            'ownerId' => 'integer|exists:players,id',
         ]);
         
         $randomRarity = Rarity::getPossibleRaritiesGivenLevel($request->level)->random();
@@ -129,7 +129,7 @@ class EquippableItemsController extends Controller
         if (!$randomRarity || !$randomBlueprint) {
             return response()->json(['error' => 'No available rarity or blueprint for the given level'], 400);
         }
-        $equippableItem = EquippableItem::createEquippableItem($randomRarity->id, $randomBlueprint->id, $request->ownerId);
+        $equippableItem = EquippableItemBlueprint::createEquippableItem($randomRarity->id, $randomBlueprint->id, $request->ownerId);
 
         return response()->json(
             $equippableItem->load('getRarity', 'getBlueprint'),

@@ -17,7 +17,8 @@ class Player extends Model
         'helmetId',
         'runeId',
         'weaponId',
-        'currentHealth'
+        'currentHealth',
+        'maxLevel'
     ];
 
     protected $casts = [

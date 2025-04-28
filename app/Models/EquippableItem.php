@@ -18,9 +18,6 @@ class EquippableItem extends Model
     ];
 
     protected $casts = [
-        'rarityId' => Rarity::class,
-        'blueprintId' => EquippableItemBlueprint::class,
-        'ownerId' => Player::class,
         'randomFactor' => 'float',
     ];
 
@@ -38,7 +35,7 @@ class EquippableItem extends Model
     {
         return $this->belongsTo(Rarity::class, 'rarityId', 'id');
     }
-    public function getOwner()
+    public function owner()
     {
         return $this->belongsTo(Player::class, 'ownerId', 'id');
     }

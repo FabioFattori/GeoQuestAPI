@@ -12,9 +12,10 @@ class UsableItem extends Model
     protected $fillable = [
         'name',
         'description',
-        'durationInSeconds',
         'healthRecovery',
-        'damageAplifier',
+        'imagePath',
+        'ownerId',
+        'rarityId',
     ];
 
     protected $casts = [
@@ -23,15 +24,15 @@ class UsableItem extends Model
         'damageAplifier' => 'integer',
     ];
 
+    protected $appends = ['rarity'];
+
     public function getRarityAttribute()
     {
         return Rarity::find($this->rarityId);
     }
 
-    public function players()
+    public function owner()
     {
-        return $this->belongsToMany(Player::class, 'usable_items_users')
-            ->withPivot('quantity')
-            ->withTimestamps();
+        return $this->belongsTo(Player::class, 'ownerId', 'id');
     }
 }

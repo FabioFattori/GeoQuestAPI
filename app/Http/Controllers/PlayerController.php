@@ -321,6 +321,11 @@ class PlayerController extends Controller
             "experienceCollected" => $request->experienceCollected ?? $player->experienceCollected,
             "nWonBattles" => $request->nWonBattles ?? $player->nWonBattles,
             "nBattles" => $request->nBattles ?? $player->nBattles,
+            "maxLevel" => $request->level > $player->maxLevel ? $request->level : $player->maxLevel,
+            "helmetId" => $request->helmetId ?? $player->helmetId,
+            "runeId" => $request->runeId ?? $player->runeId,
+            "weaponId" => $request->weaponId ?? $player->weaponId,
+            "currentHealth" => $request->currentHealth ?? $player->currentHealth,
         ]);
 
         return response()->json([

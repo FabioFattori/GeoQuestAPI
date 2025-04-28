@@ -21,50 +21,92 @@ class DatabaseSeeder extends Seeder
     {
         // use the factories
 
-        for ($i = 0; $i < 10; $i++) {
-            DB::table("players")->insert([
-                "name" => Str::random(),
-                "level" => random_int(1, 100),
-                "experienceCollected" => random_int(0, 10000),
-                "nWonBattles" => random_int(0, 100),
-                "nBattles" => random_int(0, 100),
-                "helmetId" => null,
-                "runeId" => null,
-                "weaponId" => null,
-                "currentHealth" => random_int(1, 100),
-            ]);
+        // Inseriamo 4 rarità
+        $rarities = [
+            ['name' => 'Common', 'hexColor' => '#A0A0A0', 'multiplier' => 1, 'levelRequiredToDrop' => 1],
+            ['name' => 'Rare', 'hexColor' => '#0070DD', 'multiplier' => 2, 'levelRequiredToDrop' => 10],
+            ['name' => 'Epic', 'hexColor' => '#A335EE', 'multiplier' => 4, 'levelRequiredToDrop' => 25],
+            ['name' => 'Legendary', 'hexColor' => '#FFD700', 'multiplier' => 10, 'levelRequiredToDrop' => 50],
+        ];
 
-            DB::table("users")->insert([
-                "email" => Str::random(),
-                "password" => Str::random(),
-                "playerId" => Player::all()->last()->id
-            ]);
+        DB::table('rarities')->insert($rarities);
 
-            DB::table("rarities")->insert([
-                "name" => Str::random(),
-                "hexColor" => Str::random(),
-                "multiplier" => random_int(1, 10),
-                "levelRequiredToDrop" => random_int(1, 100)
-            ]);
+        // Prendiamo gli ID appena inseriti
+        $rarityIds = DB::table('rarities')->pluck('id')->toArray();
 
-            DB::table("equippableItemBlueprints")->insert([
-                "name" => Str::random(),
-                "description" => Str::random(),
-                "type" => random_int(1, 3),
-                "requiredLevel" => random_int(1, 100),
-                "baseDamage" => random_int(1, 100),
-                "baseHealth" => random_int(1, 100),
-                "imagePath" => Str::random()
-            ]);
+        // Equippabili fighi
+        $equippables = [
+            [
+                'name' => 'Steel Sword',
+                'description' => 'A reliable sword made of steel.',
+                'type' => 1,
+                'requiredLevel' => 1,
+                'baseDamage' => 15,
+                'baseHealth' => 0,
+                'imagePath' => 'axe'
+            ],
+            [
+                'name' => 'Axe of Fury',
+                'description' => 'Ancient axe with a furious edge.',
+                'type' => 1,
+                'requiredLevel' => 18,
+                'baseDamage' => 5,
+                'baseHealth' => 5,
+                'imagePath' => 'sword'
+            ],
+            [
+                'name' => "Viking's Helmet",
+                'description' => 'A helmet that belonged to a Viking warrior.',
+                'type' => 2,
+                'requiredLevel' => 1,
+                'baseDamage' => 5,
+                'baseHealth' => 10,
+                'imagePath' => 'helmet'
+            ],
+            [
+                'name' => "Knight's Helmet",
+                'description' => 'A helmet that belonged to a Captain.',
+                'type' => 2,
+                'requiredLevel' => 5,
+                'baseDamage' => 7,
+                'baseHealth' => 7,
+                'imagePath' => 'helmet2'
+            ],
+            [
+                'name' => 'Rune of Power',
+                'description' => 'A rune that grants immense power.',
+                'type' => 3,
+                'requiredLevel' => 5,
+                'baseDamage' => 100,
+                'baseHealth' => 10,
+                'imagePath' => 'rune__1_'
+            ],
+            [
+                'name' => 'Rune of Swiftness',
+                'description' => 'A rune that grants incredible speed.',
+                'type' => 3,
+                'requiredLevel' => 15,
+                'baseDamage' => 10,
+                'baseHealth' => 100,
+                'imagePath' => 'rune__2_'
+            ]
 
-            DB::table("usableItems")->insert([
-                "name" => Str::random(),
-                'description' => Str::random(),
-                'durationInSeconds' => random_int(0, 100),
-                'healthRecovery' => random_int(0, 100),
-                'damageAplifier' => random_int(1, 2),
-                "rarityId" => Rarity::inRandomOrder()->first()->id
-            ]);
-        }
+        ];
+
+        DB::table('equippableItemBlueprints')->insert($equippables);
+
+        // Oggetti utilizzabili per le battaglie
+        $usableItems = [
+            [
+                'name' => 'Healing Potion',
+                'description' => 'Restores 50 health instantly.',
+                'healthRecovery' => 50,
+                'rarityId' => $rarityIds[0],
+                'imagePath' => 'lifePotion'
+            ]
+        ];
+
+        DB::table('usableItems')->insert($usableItems);
+        
     }
 }

@@ -18,9 +18,11 @@ return new class extends Migration
             $table->foreignId('rarityId')
                 ->constrained('rarities');
             $table->integer('healthRecovery');
-            $table->integer('damageAplifier');
-            $table->integer('durationInSeconds');
+            $table->string('imagePath');
             $table->timestamps();
+            $table->foreignId('ownerId')
+                ->constrained('players')
+                ->nullable();
         });
     }
 
