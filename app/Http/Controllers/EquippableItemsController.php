@@ -132,7 +132,7 @@ class EquippableItemsController extends Controller
         $equippableItem = EquippableItemBlueprint::createEquippableItem($randomRarity->id, $randomBlueprint->id, $request->ownerId);
 
         return response()->json(
-            $equippableItem->load('getRarity', 'getBlueprint'),
+            $equippableItem,
             201
         );
     }

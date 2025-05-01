@@ -33,9 +33,9 @@ class Player extends Model
         "updatedAt"
     ];
 
-    protected $appends = ['experienceNeeded','damage','maxHealth'];
+    protected $appends = ['experienceNeeded', 'damage', 'maxHealth','helmet', 'rune', 'weapon', 'experienceToLevelUp'];
 
-    private static function linearFunction($a,$b,$level)
+    private static function linearFunction($a, $b, $level)
     {
         $level = max($level, 1);
         return ceil($a * $level + $b);
@@ -54,7 +54,7 @@ class Player extends Model
     public function getExperienceNeededAttribute()
     {
         if ($this->level <= 0) {
-            $this->level = 1; 
+            $this->level = 1;
         }
         $a = 50;
         $b = 150;
@@ -68,8 +68,24 @@ class Player extends Model
         return $this->experienceNeeded - $this->experienceCollected;
     }
 
-    public function getUser(){
+    public function getUser()
+    {
         return $this->hasOne(User::class, 'playerId', 'id');
+    }
+
+    public function getHelmetAttribute()
+    {
+        return $this->hasOne(EquippableItem::class, 'id', 'helmetId');
+    }
+
+    public function getRuneAttribute()
+    {
+        return $this->hasOne(EquippableItem::class, 'id', 'runeId');
+    }
+
+    public function getWeaponAttribute()
+    {
+        return $this->hasOne(EquippableItem::class, 'id', 'weaponId');
     }
 
     // Equippable items methods
@@ -97,8 +113,8 @@ class Player extends Model
     }
 
     public static function getPlayerToReturnById($id)
-{
-    return self::find($id);
-}
+    {
+        return self::find($id);
+    }
 
 }

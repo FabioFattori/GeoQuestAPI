@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class EquippableItem extends Model
 {
     use HasFactory;
-    
-    protected $table = 'equippableItemBlueprints'; 
+
+    protected $table = 'equippableItems';
     protected $fillable = [
         'rarityId',
         'blueprintId',
@@ -27,11 +27,20 @@ class EquippableItem extends Model
         'randomFactor',
     ];
 
-    
-    protected $appends = ['damage','health','blueprint'];
 
+    protected $appends = ['damage', 'health', 'blueprint', 'rarity'];
 
-    public function getRarity()
+    public function getBlueprintAttribute()
+    {
+        return $this->blueprint()->first();
+    }
+
+    public function getRarityAttribute()
+    {
+        return $this->rarity()->first();
+    }
+
+    public function rarity()
     {
         return $this->belongsTo(Rarity::class, 'rarityId', 'id');
     }
@@ -40,28 +49,23 @@ class EquippableItem extends Model
         return $this->belongsTo(Player::class, 'ownerId', 'id');
     }
 
-    public function getBlueprint()
+    public function blueprint()
     {
         return $this->belongsTo(EquippableItemBlueprint::class, 'blueprintId', 'id');
     }
 
     protected function calculateRandomValue($baseValue)
     {
-        return ($baseValue + $this->randomFactor) * $this->getRarity->damageMultiplier;
+        return ($baseValue + $this->randomFactor) * $this->rarity->damageMultiplier;
     }
 
     public function getDamageAttribute()
     {
-        return $this->calculateRandomValue($this->getBlueprint->baseDamage);
+        return $this->calculateRandomValue($this->blueprint->baseDamage);
     }
 
     public function getHealthAttribute()
     {
-        return $this->calculateRandomValue($this->getBlueprint->baseHealth);
-    }
-
-    public function getBlueprintAttribute()
-    {
-        return $this->getBlueprint;
+        return $this->calculateRandomValue($this->blueprint->baseHealth);
     }
 }
