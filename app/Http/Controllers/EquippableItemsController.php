@@ -175,7 +175,7 @@ class EquippableItemsController extends Controller
     {
         $request->validate([
             'ownerId' => 'required|integer|exists:players,id',
-            'type' => 'required|string|in:weapon,armor,rune',
+            'type' => 'required|integer|in:1,2,3',
         ]);
 
         $equippableItems = EquippableItem::where('ownerId', $request->ownerId)->get();
