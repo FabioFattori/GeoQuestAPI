@@ -136,4 +136,53 @@ class EquippableItemsController extends Controller
             201
         );
     }
+
+    /**
+ * @OA\Get(
+ *     path="/api/equippableItems/getInventory",
+ *     summary="Recupera l'inventario del giocatore",
+ *     description="Ritorna gli oggetti equipaggiabili di un giocatore filtrati per tipo (weapon, armor, rune).",
+ *     operationId="getInventory",
+ *     tags={"EquippableItems"},
+ *     @OA\Parameter(
+ *         name="ownerId",
+ *         in="query",
+ *         description="ID del giocatore (owner)",
+ *         required=true,
+ *         @OA\Schema(type="integer", example=42)
+ *     ),
+ *     @OA\Parameter(
+ *         name="type",
+ *         in="query",
+ *         description="Tipo di oggetto equipaggiabile",
+ *         required=true,
+ *         @OA\Schema(type="string", enum={"weapon", "armor", "rune"}, example="weapon")
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Lista di oggetti equipaggiabili",
+ *         @OA\JsonContent(
+ *             type="string",
+ *             example="Lista di oggetti equipaggiabili in formato JSON")
+ *     ),
+ *     @OA\Response(
+ *         response=422,
+ *         description="Errore di validazione"
+ *     )
+ * )
+ */
+    public function getInventory(Request $request) : JsonResponse
+    {
+        $request->validate([
+            'ownerId' => 'required|integer|exists:players,id',
+            'type' => 'required|string|in:weapon,armor,rune',
+        ]);
+
+        $equippableItems = EquippableItem::where('ownerId', $request->ownerId)->get();
+
+        $equippableItems = $equippableItems->filter(function ($item) use ($request) {
+            return $item->getBlueprint->type === $request->type;
+        });
+        return response()->json($equippableItems);
+    }
 }

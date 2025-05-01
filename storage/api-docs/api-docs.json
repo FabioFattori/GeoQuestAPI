@@ -230,6 +230,59 @@
                 }
             }
         },
+        "/api/equippableItems/getInventory": {
+            "get": {
+                "tags": [
+                    "EquippableItems"
+                ],
+                "summary": "Recupera l'inventario del giocatore",
+                "description": "Ritorna gli oggetti equipaggiabili di un giocatore filtrati per tipo (weapon, armor, rune).",
+                "operationId": "getInventory",
+                "parameters": [
+                    {
+                        "name": "ownerId",
+                        "in": "query",
+                        "description": "ID del giocatore (owner)",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 42
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Tipo di oggetto equipaggiabile",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "weapon",
+                                "armor",
+                                "rune"
+                            ],
+                            "example": "weapon"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista di oggetti equipaggiabili",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "example": "Lista di oggetti equipaggiabili in formato JSON"
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Errore di validazione"
+                    }
+                }
+            }
+        },
         "/api/player": {
             "post": {
                 "tags": [

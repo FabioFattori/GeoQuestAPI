@@ -33,6 +33,7 @@ Route::prefix("api")->group(
         Route::get("/equippableItems", [EquippableItemsController::class, 'getAll']);
         Route::get("/equippableItems/{id}", [EquippableItemsController::class, 'getById']);
         Route::post("/equippableItems", [EquippableItemsController::class, 'createRandomItem']);
+        Route::get("/equippableItems/getInventory", [EquippableItemsController::class, 'getInventory']);
 
         // rarities
         Route::get("/rarities", [RarityController::class, 'getAll']);
@@ -40,7 +41,7 @@ Route::prefix("api")->group(
         //usable items
         Route::get("/usableItems/getAll", [UsableItemController::class, 'getAll']);
         Route::get("/usableItems/getUsableItemsOfUser", [UsableItemController::class, 'getUsableItemsOfUser']);
-        Route::post("/usableItems/createRandomUsableItem", [UsableItemController::class, 'createRandomItem']);
+        Route::post("/usableItems/createRandomUsableItem/{id}", [UsableItemController::class, 'createRandomItem']);
         Route::get('/usableItems/getAll', [UsableItemController::class,'getAll']);
     }
 )->middleware(['auth:sanctum']);
