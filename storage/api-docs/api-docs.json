@@ -255,13 +255,13 @@
                         "description": "Tipo di oggetto equipaggiabile",
                         "required": true,
                         "schema": {
-                            "type": "string",
+                            "type": "integer",
                             "enum": [
-                                "weapon",
-                                "armor",
-                                "rune"
+                                1,
+                                2,
+                                3
                             ],
-                            "example": "weapon"
+                            "example": "1 = weapon, 2 = armor, 3 = rune"
                         }
                     }
                 ],

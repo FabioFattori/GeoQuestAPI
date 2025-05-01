@@ -20,7 +20,7 @@ Route::prefix("api")->group(
         Route::delete("/user/{id}", [UserController::class, 'delete']);
         Route::post("/user/login", [UserController::class, 'login']);
         Route::post("/user/logout", [UserController::class, 'logout']);
-        Route::post("/user/checkToken",[UserController::class,"checkToken"]);
+        Route::post("/user/checkToken", [UserController::class, "checkToken"]);
 
         // players
         Route::post("/player", [PlayerController::class, 'create']);
@@ -42,6 +42,6 @@ Route::prefix("api")->group(
         Route::get("/usableItems/getAll", [UsableItemController::class, 'getAll']);
         Route::get("/usableItems/getUsableItemsOfUser", [UsableItemController::class, 'getUsableItemsOfUser']);
         Route::post("/usableItems/createRandomUsableItem/{id}", [UsableItemController::class, 'createRandomItem']);
-        Route::get('/usableItems/getAll', [UsableItemController::class,'getAll']);
+        Route::get('/usableItems/getAll', [UsableItemController::class, 'getAll']);
     }
 )->middleware(['auth:sanctum']);

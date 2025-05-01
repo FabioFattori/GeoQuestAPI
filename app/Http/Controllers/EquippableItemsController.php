@@ -116,13 +116,13 @@ class EquippableItemsController extends Controller
      *     ),
      * )
      */
-    public function createRandomItem(Request $request) : JsonResponse
+    public function createRandomItem(Request $request): JsonResponse
     {
         $request->validate([
             'level' => 'required|integer|min:1',
             'ownerId' => 'integer|exists:players,id',
         ]);
-        
+
         $randomRarity = Rarity::getPossibleRaritiesGivenLevel($request->level)->random();
         $randomBlueprint = EquippableItemBlueprint::getPossibleBlueprintsGivenLevel($request->level)->random()->first();
 
@@ -138,51 +138,51 @@ class EquippableItemsController extends Controller
     }
 
     /**
- * @OA\Get(
- *     path="/api/equippableItems/getInventory",
- *     summary="Recupera l'inventario del giocatore",
- *     description="Ritorna gli oggetti equipaggiabili di un giocatore filtrati per tipo (weapon, armor, rune).",
- *     operationId="getInventory",
- *     tags={"EquippableItems"},
- *     @OA\Parameter(
- *         name="ownerId",
- *         in="query",
- *         description="ID del giocatore (owner)",
- *         required=true,
- *         @OA\Schema(type="integer", example=42)
- *     ),
- *     @OA\Parameter(
- *         name="type",
- *         in="query",
- *         description="Tipo di oggetto equipaggiabile",
- *         required=true,
- *         @OA\Schema(type="string", enum={"weapon", "armor", "rune"}, example="weapon")
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Lista di oggetti equipaggiabili",
- *         @OA\JsonContent(
- *             type="string",
- *             example="Lista di oggetti equipaggiabili in formato JSON")
- *     ),
- *     @OA\Response(
- *         response=422,
- *         description="Errore di validazione"
- *     )
- * )
- */
-    public function getInventory(Request $request) : JsonResponse
+     * @OA\Get(
+     *     path="/api/equippableItems/getInventory",
+     *     summary="Recupera l'inventario del giocatore",
+     *     description="Ritorna gli oggetti equipaggiabili di un giocatore filtrati per tipo (weapon, armor, rune).",
+     *     operationId="getInventory",
+     *     tags={"EquippableItems"},
+     *     @OA\Parameter(
+     *         name="ownerId",
+     *         in="query",
+     *         description="ID del giocatore (owner)",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=42)
+     *     ),
+     *     @OA\Parameter(
+     *         name="type",
+     *         in="query",
+     *         description="Tipo di oggetto equipaggiabile",
+     *         required=true,
+     *         @OA\Schema(type="integer", enum={1,2,3}, example="1 = weapon, 2 = armor, 3 = rune")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista di oggetti equipaggiabili",
+     *         @OA\JsonContent(
+     *             type="string",
+     *             example="Lista di oggetti equipaggiabili in formato JSON")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Errore di validazione"
+     *     )
+     * )
+     */
+    public function getInventory(Request $request)
     {
         $request->validate([
             'ownerId' => 'required|integer|exists:players,id',
             'type' => 'required|integer|in:1,2,3',
         ]);
-
-        $equippableItems = EquippableItem::where('ownerId', $request->ownerId)->get();
-
-        $equippableItems = $equippableItems->filter(function ($item) use ($request) {
-            return $item->getBlueprint->type === $request->type;
+        $equippableItems = EquippableItem::with(['blueprint', 'rarity'])
+            ->where('ownerId', "=", $request->ownerId)
+            ->get();
+        $filteredItems = $equippableItems->filter(function ($item) use ($request) {
+            return $item->blueprint->type === (int) $request->type;
         });
-        return response()->json($equippableItems);
+        return response()->json($filteredItems);
     }
 }
