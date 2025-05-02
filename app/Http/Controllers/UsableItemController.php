@@ -87,7 +87,7 @@ class UsableItemController extends Controller
         if (!$player) {
             return response()->json(['error' => 'Player not found'], 404);
         }
-        return response()->json($player->usableItems, 200);
+        return response()->json($player->getUsableItems()->get(), 200);
     }
 
         /**

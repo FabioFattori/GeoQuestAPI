@@ -183,6 +183,6 @@ class EquippableItemsController extends Controller
         $filteredItems = $equippableItems->filter(function ($item) use ($request) {
             return $item->blueprint->type === (int) $request->type;
         });
-        return response()->json($filteredItems);
+        return response()->json($filteredItems->values());
     }
 }

@@ -33,7 +33,7 @@ class Player extends Model
         "updatedAt"
     ];
 
-    protected $appends = ['experienceNeeded', 'damage', 'maxHealth','helmet', 'rune', 'weapon', 'experienceToLevelUp'];
+    protected $appends = ['experienceNeeded', 'damage', 'maxHealth', 'helmet', 'rune', 'weapon', 'experienceToLevelUp'];
 
     private static function linearFunction($a, $b, $level)
     {
