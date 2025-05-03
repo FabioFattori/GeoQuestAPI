@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Player;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\EquippableItemBlueprint;
@@ -139,7 +140,7 @@ class EquippableItemsController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/equippableItems/getInventory",
+     *     path="/api/inventory",
      *     summary="Recupera l'inventario del giocatore",
      *     description="Ritorna gli oggetti equipaggiabili di un giocatore filtrati per tipo (weapon, armor, rune).",
      *     operationId="getInventory",
@@ -177,12 +178,17 @@ class EquippableItemsController extends Controller
             'ownerId' => 'required|integer|exists:players,id',
             'type' => 'required|integer|in:1,2,3',
         ]);
+        $player = Player::find($request->ownerId);
+
         $equippableItems = EquippableItem::with(['blueprint', 'rarity'])
-            ->where('ownerId', "=", $request->ownerId)
+            ->where('ownerId', $request->ownerId)
+            ->where('id', '!=', $player->helmetId)
+            ->where('id', '!=', $player->weaponId)
+            ->where('id', '!=', $player->runeId)
+            ->whereHas('blueprint', function ($query) use ($request) {
+                $query->where('type', (int) $request->type);
+            })
             ->get();
-        $filteredItems = $equippableItems->filter(function ($item) use ($request) {
-            return $item->blueprint->type === (int) $request->type;
-        });
-        return response()->json($filteredItems->values());
+        return response()->json($equippableItems->values());
     }
 }

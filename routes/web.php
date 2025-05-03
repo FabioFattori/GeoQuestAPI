@@ -12,7 +12,7 @@ use App\Models\EquippableItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
+Route::get('/', function (Request $request) {
     return redirect('api/documentation');
 });
 
@@ -41,22 +41,10 @@ Route::prefix("api")->group(
         Route::get("/equippableItems", [EquippableItemsController::class, 'getAll']);
         Route::get("/equippableItems/{id}", [EquippableItemsController::class, 'getById']);
         Route::post("/equippableItems", [EquippableItemsController::class, 'createRandomItem']);
-        
+        Route::get("/inventory", [EquippableItemsController::class, 'getInventory']);
+
         // rarities
         Route::get("/rarities", [RarityController::class, 'getAll']);
-        Route::get("/getInventory",function(Request $request){
-            $request->validate([
-                'ownerId' => 'required|integer|exists:players,id',
-                'type' => 'required|integer|in:1,2,3',
-            ]);
-            $equippableItems = EquippableItem::with(['blueprint', 'rarity'])
-                ->where('ownerId', "=", $request->ownerId)
-                ->get();
-            $filteredItems = $equippableItems->filter(function ($item) use ($request) {
-                return $item->blueprint->type === (int) $request->type;
-            });
-            return response()->json($filteredItems->values());
-        });
 
         //usable items
         Route::get("/usableItems/getAll", [UsableItemController::class, 'getAll']);
@@ -72,6 +60,4 @@ Route::prefix("api")->group(
         Route::get("/collectedPois/getAll", [CompletedPoiController::class, 'getAll']);
         Route::post("/collectedPois/create", [CompletedPoiController::class, 'create']);
     }
-    )->middleware(['auth:sanctum']);
-    
-    // Route::get("api/equippableItems/getInventory", [EquippableItemsController::class, 'getInventory']);
+)->middleware(['auth:sanctum']);

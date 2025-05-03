@@ -43,7 +43,7 @@ class DatabaseSeeder extends Seeder
                 'requiredLevel' => 1,
                 'baseDamage' => 15,
                 'baseHealth' => 0,
-                'imagePath' => 'axe'
+                'imagePath' => 'sword'
             ],
             [
                 'name' => 'Axe of Fury',
@@ -52,7 +52,7 @@ class DatabaseSeeder extends Seeder
                 'requiredLevel' => 18,
                 'baseDamage' => 5,
                 'baseHealth' => 5,
-                'imagePath' => 'sword'
+                'imagePath' => 'axe'
             ],
             [
                 'name' => "Viking's Helmet",
