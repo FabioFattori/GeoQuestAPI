@@ -31,7 +31,6 @@ return new class extends Migration {
                 ->constrained('equippableItemBlueprints');
             $table->foreignId('rarityId')
                 ->constrained('rarities');
-            $table->string('imagePath');
             $table->foreignId('ownerId')
                 ->constrained('players')->nullable();
             $table->timestamps();

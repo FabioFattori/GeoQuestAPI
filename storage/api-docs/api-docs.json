@@ -5,6 +5,203 @@
         "version": "1.0.0"
     },
     "paths": {
+        "/api/collectedPois/getAll": {
+            "get": {
+                "tags": [
+                    "CompletedPois"
+                ],
+                "summary": "Restituisce tutti i POI raccolti da un giocatore",
+                "operationId": "f21ef1bac4adae1eccaa8d417d52249f",
+                "parameters": [
+                    {
+                        "name": "playerId",
+                        "in": "query",
+                        "description": "ID del giocatore",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista dei POI raccolti",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The level field is required."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Errore di validazione"
+                    }
+                }
+            }
+        },
+        "/api/collectedPois/create": {
+            "post": {
+                "tags": [
+                    "CompletedPois"
+                ],
+                "summary": "Crea o aggiorna un POI raccolto da un giocatore",
+                "operationId": "e2702a5e5f48221b3953fd64f08d3342",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "playerId",
+                                    "latitude",
+                                    "longitude"
+                                ],
+                                "properties": {
+                                    "playerId": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "latitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 45.4642
+                                    },
+                                    "longitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 9.19
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "POI raccolto creato o aggiornato",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The level field is required."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Errore di validazione"
+                    }
+                }
+            }
+        },
+        "/api/completedQuests/getAll": {
+            "get": {
+                "tags": [
+                    "CompletedQuests"
+                ],
+                "summary": "Restituisce tutte le missioni completate da un giocatore",
+                "operationId": "65d3ce36bda81dfd01218710058bcfb1",
+                "parameters": [
+                    {
+                        "name": "playerId",
+                        "in": "query",
+                        "description": "ID del giocatore",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista delle missioni completate",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The level field is required."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Errore di validazione"
+                    }
+                }
+            }
+        },
+        "/api/completedQuests/create": {
+            "post": {
+                "tags": [
+                    "CompletedQuests"
+                ],
+                "summary": "Crea una nuova missione completata per un giocatore",
+                "operationId": "fa6b19089addf22c660253f4da6d3a77",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "playerId",
+                                    "name"
+                                ],
+                                "properties": {
+                                    "playerId": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Missione del Drago"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Missione completata creata",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The level field is required."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Errore di validazione"
+                    }
+                }
+            }
+        },
         "/api/equippableItems": {
             "get": {
                 "tags": [
@@ -1193,6 +1390,14 @@
         }
     },
     "tags": [
+        {
+            "name": "CompletedPois",
+            "description": "CompletedPois"
+        },
+        {
+            "name": "CompletedQuests",
+            "description": "CompletedQuests"
+        },
         {
             "name": "EquippableItems",
             "description": "EquippableItems"

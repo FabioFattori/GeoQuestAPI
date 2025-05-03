@@ -33,7 +33,17 @@ class Player extends Model
         "updatedAt"
     ];
 
-    protected $appends = ['experienceNeeded', 'damage', 'maxHealth', 'helmet', 'rune', 'weapon', 'experienceToLevelUp'];
+    protected $appends = [
+        'experienceNeeded',
+        'damage',
+        'maxHealth',
+        'helmet',
+        'rune',
+        'weapon',
+        'experienceToLevelUp',
+        'completedQuests',
+        'collectedPOIs',
+    ];
 
     private static function linearFunction($a, $b, $level)
     {
@@ -75,17 +85,23 @@ class Player extends Model
 
     public function getHelmetAttribute()
     {
-        return $this->hasOne(EquippableItem::class, 'id', 'helmetId');
+        if (!$this->helmetId)
+            return null;
+        return EquippableItem::find($this->helmetId);
     }
 
     public function getRuneAttribute()
     {
-        return $this->hasOne(EquippableItem::class, 'id', 'runeId');
+        if (!$this->runeId)
+            return null;
+        return EquippableItem::find($this->runeId);
     }
 
     public function getWeaponAttribute()
     {
-        return $this->hasOne(EquippableItem::class, 'id', 'weaponId');
+        if (!$this->weaponId)
+            return null;
+        return EquippableItem::find($this->weaponId);
     }
 
     // Equippable items methods
@@ -110,6 +126,28 @@ class Player extends Model
     public function getUsableItems()
     {
         return $this->hasMany(UsableItem::class, 'ownerId', 'id');
+    }
+
+    // RELAZIONI ELOQUENT
+    public function completedQuests()
+    {
+        return $this->hasMany(CompletedQuest::class, 'playerId', 'id');
+    }
+
+    public function collectedPOIs()
+    {
+        return $this->hasMany(CollectedPOI::class, 'playerId', 'id');
+    }
+
+    // ACCESSORS PER JSON
+    public function getCompletedQuestsAttribute()
+    {
+        return $this->completedQuests()->get();
+    }
+
+    public function getCollectedPOIsAttribute()
+    {
+        return $this->collectedPOIs()->get();
     }
 
     public static function getPlayerToReturnById($id)

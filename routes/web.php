@@ -1,16 +1,25 @@
 <?php
 
+use App\Http\Controllers\CompletedPoiController;
+use App\Http\Controllers\CompletedQuestController;
 use App\Http\Controllers\EquippableItemsController;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\RarityController;
 use App\Http\Controllers\UsableItemController;
 use App\Http\Controllers\UserController;
+use App\Models\CompletedQuest;
 use App\Models\EquippableItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return redirect('api/documentation');
+});
+
+Route::prefix('api')->group(function () {
+    Route::post("/user/login", [UserController::class, 'login']);
+    Route::post("/user/logout", [UserController::class, 'logout']);
+    Route::post("/user/checkToken", [UserController::class, "checkToken"]);
 });
 
 Route::prefix("api")->group(
@@ -20,9 +29,6 @@ Route::prefix("api")->group(
         Route::get("/user/all", [UserController::class, 'getAll']);
         Route::get("/user/{id}", [UserController::class, 'getById']);
         Route::delete("/user/{id}", [UserController::class, 'delete']);
-        Route::post("/user/login", [UserController::class, 'login']);
-        Route::post("/user/logout", [UserController::class, 'logout']);
-        Route::post("/user/checkToken", [UserController::class, "checkToken"]);
 
         // players
         Route::post("/player", [PlayerController::class, 'create']);
@@ -57,6 +63,14 @@ Route::prefix("api")->group(
         Route::get("/usableItems/getUsableItemsOfUser", [UsableItemController::class, 'getUsableItemsOfUser']);
         Route::post("/usableItems/createRandomUsableItem", [UsableItemController::class, 'createRandomItem']);
         Route::get('/usableItems/getAll', [UsableItemController::class, 'getAll']);
+
+        // completed quests
+        Route::get("/completedQuests/getAll", [CompletedQuestController::class, 'getAll']);
+        Route::post("/completedQuests/create", [CompletedQuestController::class, 'create']);
+
+        // collected pois
+        Route::get("/collectedPois/getAll", [CompletedPoiController::class, 'getAll']);
+        Route::post("/collectedPois/create", [CompletedPoiController::class, 'create']);
     }
     )->middleware(['auth:sanctum']);
     
