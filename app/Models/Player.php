@@ -136,7 +136,7 @@ class Player extends Model
 
     public function collectedPOIs()
     {
-        return $this->hasMany(CollectedPOI::class, 'playerId', 'id');
+        return $this->hasMany(CollectedPoi::class, 'playerId', 'id');
     }
 
     // ACCESSORS PER JSON
