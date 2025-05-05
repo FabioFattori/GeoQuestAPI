@@ -240,7 +240,13 @@ class PlayerController extends Controller
      *                  type="integer",
      *                 description="ID dell'arma equipaggiata dal giocatore",
      *                  example=3
-     *                )
+     *                ),
+     *                @OA\Property(
+     *                   property="currentHealth",
+     *                  type="integer",
+     *                 description="Salute attuale del giocatore",
+     *                  example=10
+     *               )
      *             )
      *         )
      *     ),
@@ -255,7 +261,8 @@ class PlayerController extends Controller
      *                 @OA\Property(property="level", type="integer", example=10),
      *                 @OA\Property(property="experienceCollected", type="integer", example=1000),
      *                 @OA\Property(property="nWonBattles", type="integer", example=50),
-     *                 @OA\Property(property="nBattles", type="integer", example=75)
+     *                 @OA\Property(property="nBattles", type="integer", example=75),
+     *                 @OA\Property(property="currentHealth", type="integer", example=10),
      *             )
      *         )
      *     ),
@@ -288,6 +295,7 @@ class PlayerController extends Controller
             "helmetId" => "integer|exists:equippableItems,id",
             "runeId" => "integer|exists:equippableItems,id",
             "weaponId" => "integer|exists:equippableItems,id",
+            "currentHealth" => "integer|min:0",
         ]);
 
         // get the helmet,rune and weapon and checks that they are not already owned by another player

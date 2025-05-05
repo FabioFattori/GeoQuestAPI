@@ -669,6 +669,11 @@
                                         "description": "ID dell'arma equipaggiata dal giocatore",
                                         "type": "integer",
                                         "example": 3
+                                    },
+                                    "currentHealth": {
+                                        "description": "Salute attuale del giocatore",
+                                        "type": "integer",
+                                        "example": 10
                                     }
                                 },
                                 "type": "object"
@@ -712,6 +717,10 @@
                                                 "nBattles": {
                                                     "type": "integer",
                                                     "example": 75
+                                                },
+                                                "currentHealth": {
+                                                    "type": "integer",
+                                                    "example": 10
                                                 }
                                             },
                                             "type": "object"
