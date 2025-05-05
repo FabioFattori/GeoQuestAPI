@@ -184,4 +184,44 @@ class UsableItemController extends Controller
         ], 201);
     }
 
+    /**
+     * @OA\Delete(
+     *     path="/api/usableItems/{id}",
+     *     summary="Elimina un oggetto utilizzabile",
+     *     description="Elimina un oggetto utilizzabile specificato dall'ID.",
+     *     operationId="deleteUsableItem",
+     *     tags={"UsableItems"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID dell'oggetto utilizzabile da eliminare",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Oggetto utilizzabile eliminato con successo",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Usable item deleted successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Oggetto utilizzabile non trovato",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Usable item not found")
+     *         )
+     *     )
+     * )
+     */
+    public function destroy($id): JsonResponse
+    {
+        $usableItem = UsableItem::find($id);
+        if (!$usableItem) {
+            return response()->json(['message' => 'Usable item not found'], 404);
+        }
+        $usableItem->delete();
+        return response()->json(['message' => 'Usable item deleted successfully'], 200);
+    }
+
 }

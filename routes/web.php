@@ -50,7 +50,7 @@ Route::prefix("api")->group(
         Route::get("/usableItems/getAll", [UsableItemController::class, 'getAll']);
         Route::get("/usableItems/getUsableItemsOfUser", [UsableItemController::class, 'getUsableItemsOfUser']);
         Route::post("/usableItems/createRandomUsableItem", [UsableItemController::class, 'createRandomItem']);
-        Route::get('/usableItems/getAll', [UsableItemController::class, 'getAll']);
+        Route::delete("/usableItems/{id}", [UsableItemController::class, 'destroy']);
 
         // completed quests
         Route::get("/completedQuests/getAll", [CompletedQuestController::class, 'getAll']);

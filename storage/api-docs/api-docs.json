@@ -985,6 +985,61 @@
                 }
             }
         },
+        "/api/usableItems/{id}": {
+            "delete": {
+                "tags": [
+                    "UsableItems"
+                ],
+                "summary": "Elimina un oggetto utilizzabile",
+                "description": "Elimina un oggetto utilizzabile specificato dall'ID.",
+                "operationId": "deleteUsableItem",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID dell'oggetto utilizzabile da eliminare",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Oggetto utilizzabile eliminato con successo",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Usable item deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Oggetto utilizzabile non trovato",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Usable item not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/user": {
             "post": {
                 "tags": [
