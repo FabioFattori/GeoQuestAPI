@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Player;
 use App\Models\Enums\EquippableItemType;
+use App\Http\Controllers\LeagueController;
 
 class PlayerController extends Controller
 {
@@ -349,5 +350,82 @@ class PlayerController extends Controller
             return true;
         }
         return false;
+    }
+
+   /**
+ * @OA\Get(
+ *     path="/api/league",
+ *     summary="Get player ranking and league list",
+ *     description="Restituisce la lista ordinata dei giocatori per win rate e la posizione del player specificato.",
+ *     operationId="getLeagueList",
+ *     tags={"Player"},
+ *     @OA\Parameter(
+ *         name="playerId",
+ *         in="query",
+ *         required=true,
+ *         description="ID del giocatore di cui calcolare la posizione",
+ *         @OA\Schema(type="integer", example=42)
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Classifica restituita con successo",
+ *         @OA\JsonContent(
+ *             @OA\Property(
+ *                 property="players",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     type="object",
+ *                     @OA\Property(property="id", type="integer", example=1),
+ *                     @OA\Property(property="name", type="string", example="Mario"),
+ *                     @OA\Property(property="nBattles", type="integer", example=50),
+ *                     @OA\Property(property="nWonBattles", type="integer", example=30),
+ *                     @OA\Property(property="win_rate", type="number", format="float", example=0.6)
+ *                 )
+ *             ),
+ *             @OA\Property(property="position", type="integer", example=1)
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=422,
+ *         description="Errore di validazione",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+ *             @OA\Property(
+ *                 property="errors",
+ *                 type="object",
+ *                 @OA\Property(
+ *                     property="playerId",
+ *                     type="array",
+ *                     @OA\Items(type="string", example="The selected playerId is invalid.")
+ *                 )
+ *             )
+ *         )
+ *     )
+ * )
+ */
+    public function getLeagueList(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate(
+            [
+                "playerId" => "required|integer|exists:players,id",
+            ]
+            );
+
+        $players = LeagueController::calculatePositions();
+
+            // now get the player position in the list
+        $position = $players->search(function ($item) use ($request) {
+            return $item->id == $request->playerId;
+        });
+
+        if ($position !== false) {
+    $position += 1; // perché è 0-based
+} else {
+    $position = null; // non trovato
+}
+        return response()->json([
+            "players" => $players,
+            "position" => $position,
+        ], 200);
     }
 }

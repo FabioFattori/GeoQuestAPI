@@ -531,6 +531,231 @@
                 }
             }
         },
+        "/api/league/canGetReward": {
+            "get": {
+                "tags": [
+                    "League"
+                ],
+                "summary": "Verifica se il giocatore può riscattare il premio settimanale",
+                "description": "Controlla se il giocatore ha già ricevuto un premio questa settimana o se è idoneo per riceverlo.",
+                "operationId": "canGetReward",
+                "parameters": [
+                    {
+                        "name": "playerId",
+                        "in": "query",
+                        "description": "ID del giocatore",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 42
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Il giocatore può ricevere il premio",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Player can have the reward"
+                                        },
+                                        "position": {
+                                            "type": "integer",
+                                            "example": 5
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "413": {
+                        "description": "Il giocatore ha già ricevuto il premio questa settimana",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Reward already claimed."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "414": {
+                        "description": "Il giocatore non può ricevere il premio (prima richiesta registrata)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Player cannot have the reward"
+                                        },
+                                        "position": {
+                                            "type": "integer",
+                                            "example": 20
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Errore di validazione",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "playerId": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The selected playerId is invalid."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/league/getReward": {
+            "post": {
+                "tags": [
+                    "League"
+                ],
+                "summary": "Riscatta il premio settimanale del giocatore",
+                "description": "Ritorna un oggetto equipaggiabile generato in base alla posizione settimanale del giocatore.",
+                "operationId": "getReward",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "playerId"
+                                ],
+                                "properties": {
+                                    "playerId": {
+                                        "type": "integer",
+                                        "example": 42
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Premio riscattato con successo",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Reward claimed successfully."
+                                        },
+                                        "reward": {
+                                            "description": "Oggetto equipaggiabile generato",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 123
+                                                },
+                                                "rarity_id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "blueprint_id": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "player_id": {
+                                                    "type": "integer",
+                                                    "example": 42
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Il giocatore non è stato trovato nella lega",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Player not found in league."
+                                        },
+                                        "reward": {
+                                            "type": "string",
+                                            "example": null
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Errore di validazione",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "playerId": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The selected playerId is invalid."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/player": {
             "post": {
                 "tags": [
@@ -824,6 +1049,103 @@
                     },
                     "404": {
                         "description": "Player not found"
+                    }
+                }
+            }
+        },
+        "/api/league": {
+            "get": {
+                "tags": [
+                    "Player"
+                ],
+                "summary": "Get player ranking and league list",
+                "description": "Restituisce la lista ordinata dei giocatori per win rate e la posizione del player specificato.",
+                "operationId": "getLeagueList",
+                "parameters": [
+                    {
+                        "name": "playerId",
+                        "in": "query",
+                        "description": "ID del giocatore di cui calcolare la posizione",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 42
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Classifica restituita con successo",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "players": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Mario"
+                                                    },
+                                                    "nBattles": {
+                                                        "type": "integer",
+                                                        "example": 50
+                                                    },
+                                                    "nWonBattles": {
+                                                        "type": "integer",
+                                                        "example": 30
+                                                    },
+                                                    "win_rate": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 0.6
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "position": {
+                                            "type": "integer",
+                                            "example": 1
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Errore di validazione",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "playerId": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The selected playerId is invalid."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -1638,6 +1960,10 @@
         {
             "name": "EquippableItems",
             "description": "EquippableItems"
+        },
+        {
+            "name": "League",
+            "description": "League"
         },
         {
             "name": "Player",

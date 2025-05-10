@@ -125,7 +125,7 @@ class EquippableItemsController extends Controller
         ]);
 
         $randomRarity = Rarity::getPossibleRaritiesGivenLevel($request->level)->random();
-        $randomBlueprint = EquippableItemBlueprint::getPossibleBlueprintsGivenLevel($request->level)->random()->first();
+        $randomBlueprint = EquippableItemBlueprint::getPossibleBlueprintsGivenLevel($request->level)->random();
 
         if (!$randomRarity || !$randomBlueprint) {
             return response()->json(['error' => 'No available rarity or blueprint for the given level'], 400);

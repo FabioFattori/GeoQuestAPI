@@ -107,6 +107,35 @@ class DatabaseSeeder extends Seeder
         ];
 
         DB::table('usableItems')->insert($usableItems);
+
+        $players = [
+            [
+                'name' => 'Player1',
+                'nBattles' => 10,
+                'nWonBattles' => 5,
+            ],
+
+            [
+                'name' => 'Player2',
+                'nBattles' => 15,
+                'nWonBattles' => 1,
+            ],
+
+            [
+                'name' => 'Player3',
+                'nBattles' => 100,
+                'nWonBattles' => 75,
+            ],
+
+            [
+                'name' => 'Player4',
+                'nBattles' => 10,
+                'nWonBattles' => 0,
+            ],
+
+        ];
+
+        DB::table('players')->insert($players);
         
     }
 }

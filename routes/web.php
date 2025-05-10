@@ -5,6 +5,7 @@ use App\Http\Controllers\CompletedQuestController;
 use App\Http\Controllers\EquippableItemsController;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\RarityController;
+use App\Http\Controllers\LeagueController;
 use App\Http\Controllers\UsableItemController;
 use App\Http\Controllers\UserController;
 use App\Models\CompletedQuest;
@@ -62,5 +63,10 @@ Route::prefix("api")->group(
         // collected pois
         Route::get("/collectedPois/getAll", [CompletedPoiController::class, 'getAll']);
         Route::post("/collectedPois/create", [CompletedPoiController::class, 'create']);
+
+        // league
+        Route::get("/league/canGetReward", [LeagueController::class, 'canGetReward']);
+        Route::post("/league/getReward", [LeagueController::class, 'getReward']);
+        Route::get("/league", [PlayerController::class, 'getLeagueList']);
     }
 )->middleware(['auth:sanctum']);
