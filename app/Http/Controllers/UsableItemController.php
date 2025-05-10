@@ -224,4 +224,94 @@ class UsableItemController extends Controller
         return response()->json(['message' => 'Usable item deleted successfully'], 200);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/usableItems/{id}",
+     *     summary="Get a usable item by ID",
+     *     description="Retrieve a specific usable item by its ID.",
+     *     operationId="getUsableItemById",
+     *     tags={"UsableItems"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the usable item to retrieve",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Usable item found",
+     * @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Usable item found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Usable item not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Usable item not found")
+     *         )
+     *     )
+     * )
+     */
+    public function getById($id) : JsonResponse
+    {
+        $usableItem = UsableItem::find($id);
+        if (!$usableItem) {
+            return response()->json(['message' => 'Usable item not found'], 404);
+        }
+        return response()->json($usableItem, 200);
+    }
+
+    /**
+     * @OA\Put(
+     *     path="/api/usableItems/{id}",
+     *     summary="Update a usable item",
+     *     description="Update the details of a specific usable item by its ID.",
+     *     operationId="updateUsableItem",
+     *     tags={"UsableItems"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the usable item to update",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Details to update the usable item",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="ownerId", type="integer")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Usable item updated successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Usable item updated successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Usable item not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Usable item not found")
+     *         )
+     *    )
+        * )
+    */
+     
+    public function update(Request $request, $id): JsonResponse
+    {
+        $request->validate([
+            'ownerId' => 'integer|exists:players,id',
+        ]);
+        $usableItem = UsableItem::find($id);
+        if (!$usableItem) {
+            return response()->json(['message' => 'Usable item not found'], 404);
+        }
+        $usableItem->update($request->only(['ownerId']));
+        return response()->json($usableItem, 200);
+    }
+
 }

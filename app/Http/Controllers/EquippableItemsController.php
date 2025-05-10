@@ -191,4 +191,48 @@ class EquippableItemsController extends Controller
             ->get();
         return response()->json($equippableItems->values());
     }
+
+    /**
+     * @OA\Put(
+     *     path="/api/equippableItems/{id}",
+     *     summary="Update an equippable item",
+     *     description="Updates an existing equippable item",
+     *     operationId="updateEquippableItem",
+     *     tags={"EquippableItems"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the equippable item to update",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"ownerId"},
+     *             @OA\Property(property="ownerId", type="integer", example=1)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Equippable item updated successfully",
+     *         @OA\JsonContent(type="string", example="equippableItem updated stringify"),
+     *     ),
+     * )
+     */
+    public function updateEquippableItem(Request $request, $id)
+    {
+        $request->validate([
+            'ownerId' => 'required|integer|exists:players,id',
+        ]);
+
+        $equippableItem = EquippableItem::find($id);
+        if (!$equippableItem) {
+            return response()->json(['error' => 'Equippable item not found'], 404);
+        }
+
+        $equippableItem->update($request->only(['ownerId']));
+
+        return response()->json($equippableItem);
+    }
 }

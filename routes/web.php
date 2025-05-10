@@ -41,6 +41,7 @@ Route::prefix("api")->group(
         Route::get("/equippableItems", [EquippableItemsController::class, 'getAll']);
         Route::get("/equippableItems/{id}", [EquippableItemsController::class, 'getById']);
         Route::post("/equippableItems", [EquippableItemsController::class, 'createRandomItem']);
+        Route::put("/equippableItems/{id}", [EquippableItemsController::class, 'updateEquippableItem']);
         Route::get("/inventory", [EquippableItemsController::class, 'getInventory']);
 
         // rarities
@@ -51,6 +52,8 @@ Route::prefix("api")->group(
         Route::get("/usableItems/getUsableItemsOfUser", [UsableItemController::class, 'getUsableItemsOfUser']);
         Route::post("/usableItems/createRandomUsableItem", [UsableItemController::class, 'createRandomItem']);
         Route::delete("/usableItems/{id}", [UsableItemController::class, 'destroy']);
+        Route::get("/usableItems/{id}", [UsableItemController::class, 'getById']);
+        Route::put("/usableItems/{id}", [UsableItemController::class, 'update']);
 
         // completed quests
         Route::get("/completedQuests/getAll", [CompletedQuestController::class, 'getAll']);
