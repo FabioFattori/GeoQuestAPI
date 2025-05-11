@@ -35,7 +35,7 @@ class LeagueController extends Controller
     private function isInThisWeek($date)
     {
         $now = now();
-        $updatedAt = $league->updated_at;
+        $updatedAt = $date;
 
         $currentWeek = $now->weekOfYear;
         $currentYear = $now->year;
@@ -117,17 +117,32 @@ class LeagueController extends Controller
 
         $league = League::where('playerId', $request->playerId)->first();
         $position = self::getPlayerPosition($request->playerId);
-        if(
-            !$league
-        ){
-            League::create([
-                'playerId' => $request->playerId,
-                'position' => $position,
-            ]);
+
+        // remove this return
+        return response()->json(
+            [
+                'message' => 'Player can have the reward'
+            ], 200
+        );
+
+        if($position === null){
             return response()->json(
                 [
-                    'message' => 'Player cannot have the reward',
-                    'position' => $position,
+                    'message' => 'Player has not done at least 10 battles',
+                ], 412
+            );
+        }
+
+        if(
+            !isset($league) 
+        ){
+            League::create([
+                'playerId' => $request->playerId
+            ]);
+            
+            return response()->json(
+                [
+                    'message' => 'Player cannot have the reward'
                 ],414
             );
         }
@@ -138,28 +153,27 @@ class LeagueController extends Controller
         
         return response()->json(
             [
-                'message' => 'Player can have the reward',
-                'position' => $position,
+                'message' => 'Player can have the reward'
             ], 200
         );
     }
 
     private function createReward($position,$playerId): EquippableItem{
         $player = Player::find($playerId);
-        $randomBlueprint = EquippableItemBlueprint::getPossibleBlueprintsGivenLevel($request->level)->random();
+        $randomBlueprint = EquippableItemBlueprint::getPossibleBlueprintsGivenLevel($player->level)->random();
         $chosenRarity = null;
         switch ($position) {
             case 1:
-                $chosenRarity = Rarity::where('rarity', 'Legendary')->first();
+                $chosenRarity = Rarity::where('name', 'Legendary')->first();
                 break;
             case 2 || 3:
-                $chosenRarity = Rarity::where('rarity', 'Epic')->first();
+                $chosenRarity = Rarity::where('name', 'Epic')->first();
                 break;
             default:
                 if ($position <= 20) {
-                    $chosenRarity = Rarity::where('rarity', 'Rare')->first();
+                    $chosenRarity = Rarity::where('name', 'Rare')->first();
                 } else {
-                    $chosenRarity = Rarity::where('rarity', 'Common')->first();
+                    $chosenRarity = Rarity::where('name', 'Common')->first();
                 }
                 break;
         }

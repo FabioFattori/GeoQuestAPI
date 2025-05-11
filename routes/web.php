@@ -10,6 +10,7 @@ use App\Http\Controllers\UsableItemController;
 use App\Http\Controllers\UserController;
 use App\Models\CompletedQuest;
 use App\Models\EquippableItem;
+use App\Models\League;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +22,27 @@ Route::prefix('api')->group(function () {
     Route::post("/user/login", [UserController::class, 'login']);
     Route::post("/user/logout", [UserController::class, 'logout']);
     Route::post("/user/checkToken", [UserController::class, "checkToken"]);
+    Route::post("/SUCA", function (Request $request) {
+       // Validate the request
+        $request->validate([
+            'playerId' => 'required|integer|exists:players,id',
+        ]);
+
+        $league = League::where('playerId', $request->playerId)->first();
+        if($league){
+            $league->updated_at = now();
+            $league->save();
+            $position = LeagueController::getPlayerPosition($request->playerId);
+            return response()->json([
+                'message' => 'Reward claimed successfully.',
+                'reward' => $this->createReward($position,$request->playerId),
+            ], 200);
+        }
+        return response()->json([
+            'message' => 'Player not found in league.',
+            'reward' => null,
+        ], 404);
+    });
 });
 
 Route::prefix("api")->group(
@@ -66,7 +88,11 @@ Route::prefix("api")->group(
 
         // league
         Route::get("/league/canGetReward", [LeagueController::class, 'canGetReward']);
-        Route::post("/league/getReward", [LeagueController::class, 'getReward']);
+        //Route::post("/league/getReward", [LeagueController::class, 'getReward']);
         Route::get("/league", [PlayerController::class, 'getLeagueList']);
+        Route::get("/league/all", function () {
+            return League::all();
+        });
     }
 )->middleware(['auth:sanctum']);
+        
