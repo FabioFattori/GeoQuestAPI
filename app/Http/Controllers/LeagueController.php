@@ -118,13 +118,6 @@ class LeagueController extends Controller
         $league = League::where('playerId', $request->playerId)->first();
         $position = self::getPlayerPosition($request->playerId);
 
-        // remove this return
-        return response()->json(
-            [
-                'message' => 'Player can have the reward'
-            ], 200
-        );
-
         if($position === null){
             return response()->json(
                 [
@@ -254,9 +247,86 @@ class LeagueController extends Controller
                 'reward' => $this->createReward($position,$request->playerId),
             ], 200);
         }
-        return response()->json([
-            'message' => 'Player not found in league.',
-            'reward' => null,
-        ], 404);
+        // If the player is not found in the league, create the league entry and give the reward
+
+        League::create([
+            'playerId' => $request->playerId
+        ]);
+
+        $position = self::getPlayerPosition($request->playerId);
+            return response()->json([
+                'message' => 'Reward claimed successfully.',
+                'reward' => $this->createReward($position,$request->playerId),
+            ], 200);
+    }
+
+    /**
+ * @OA\Get(
+ *     path="/api/league/findOpponent/{playerId}",
+ *     summary="Find a random opponent for a player within similar level range",
+ *     description="Given a player ID, returns a random opponent with a level between -2 and +2 of the player's level.",
+ *     operationId="findOpponent",
+ *     tags={"League"},
+ *     
+ *     @OA\Parameter(
+ *         name="playerId",
+ *         in="path",
+ *         required=true,
+ *         description="ID of the player requesting an opponent",
+ *         @OA\Schema(type="integer", example=1)
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=200,
+ *         description="Opponent found",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="id", type="integer", example=15),
+ *             @OA\Property(property="name", type="string", example="OpponentPlayer"),
+ *             @OA\Property(property="level", type="integer", example=8),
+ *             
+ *         )
+ *     ),
+ *     
+ *     @OA\Response(
+ *         response=404,
+ *         description="Player not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Player not found")
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=422,
+ *         description="Validation error (e.g. invalid or missing player ID)",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+ *             @OA\Property(
+ *                 property="errors",
+ *                 type="object",
+ *                 @OA\Property(
+ *                     property="playerId",
+ *                     type="array",
+ *                     @OA\Items(type="string", example="The playerId field is required.")
+ *                 )
+ *             )
+ *         )
+ *     )
+ * )
+ */
+    public function findOpponent($playerId) : JsonResponse
+    {
+        $player = Player::find($playerId);
+        if ($player) {
+            $opponent = Player::where('id', '!=', $playerId)
+                ->where('level', '>=', $player->level - 2)
+                ->where('level', '<=', $player->level + 2)
+                ->inRandomOrder()
+                ->first();
+
+            return response()->json($opponent);
+        }
+
+        return response()->json(['message' => 'Player not found'], 404);
     }
 }

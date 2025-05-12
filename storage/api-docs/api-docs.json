@@ -756,6 +756,98 @@
                 }
             }
         },
+        "/api/league/findOpponent/{playerId}": {
+            "get": {
+                "tags": [
+                    "League"
+                ],
+                "summary": "Find a random opponent for a player within similar level range",
+                "description": "Given a player ID, returns a random opponent with a level between -2 and +2 of the player's level.",
+                "operationId": "findOpponent",
+                "parameters": [
+                    {
+                        "name": "playerId",
+                        "in": "path",
+                        "description": "ID of the player requesting an opponent",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Opponent found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 15
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "OpponentPlayer"
+                                        },
+                                        "level": {
+                                            "type": "integer",
+                                            "example": 8
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Player not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Player not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error (e.g. invalid or missing player ID)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "playerId": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The playerId field is required."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/player": {
             "post": {
                 "tags": [
