@@ -23,13 +23,18 @@ class LeagueController extends Controller
     public static function getPlayerPosition($playerId)
     {
         // Retrieve the player's position in the league
-        $leaguePosition = self::calculatePositions()
-            ->where('playerId', $playerId)
-            ->first();
-        if ($leaguePosition) {
-            return $leaguePosition->position;
+        $leaguePosition = self::calculatePositions();
+        
+        $position = 1;
+
+        foreach ($leaguePosition as $player) {
+            if ($player->id == $playerId) {
+                return $position;
+            }
+            $position++;
         }
-        return null;
+
+        return $position;
     }
 
     private function isInThisWeek($date)
@@ -116,9 +121,10 @@ class LeagueController extends Controller
         ]);
 
         $league = League::where('playerId', $request->playerId)->first();
-        $position = self::getPlayerPosition($request->playerId);
+        $player = Player::find($request->playerId);
 
-        if($position === null){
+
+        if($player->nBattles < 10){
             return response()->json(
                 [
                     'message' => 'Player has not done at least 10 battles',
@@ -242,6 +248,7 @@ class LeagueController extends Controller
             $league->updated_at = now();
             $league->save();
             $position = self::getPlayerPosition($request->playerId);
+
             return response()->json([
                 'message' => 'Reward claimed successfully.',
                 'reward' => $this->createReward($position,$request->playerId),

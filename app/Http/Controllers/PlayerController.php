@@ -175,107 +175,61 @@ class PlayerController extends Controller
     }
 
     /**
-     * @OA\Put(
-     *     path="/api/player/{id}",
-     *     summary="Update a player",
-     *     description="Aggiorna le informazioni di un giocatore esistente, come nome, livello, esperienza raccolta, vittorie e battaglie totali.",
-     *     tags={"Player"},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         description="ID del giocatore da aggiornare",
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\MediaType(
-     *             mediaType="application/json",
-     *             @OA\Schema(
-     *                 type="object",
-     *                 required={"name"},
-     *                 @OA\Property(
-     *                     property="name",
-     *                     type="string",
-     *                     description="Nuovo nome del giocatore",
-     *                     example="john doe"
-     *                 ),
-     *                 @OA\Property(
-     *                     property="level",
-     *                     type="integer",
-     *                     description="Nuovo livello del giocatore",
-     *                     example=10
-     *                 ),
-     *                 @OA\Property(
-     *                     property="experienceCollected",
-     *                     type="integer",
-     *                     description="Esperienza raccolta dal giocatore",
-     *                     example=1000
-     *                 ),
-     *                 @OA\Property(
-     *                     property="nWonBattles",
-     *                     type="integer",
-     *                     description="Numero di battaglie vinte dal giocatore",
-     *                     example=50
-     *                 ),
-     *                 @OA\Property(
-     *                     property="nBattles",
-     *                     type="integer",
-     *                     description="Numero totale di battaglie del giocatore",
-     *                     example=75
-     *                 ),
-     *                @OA\Property(
-     *                    property="helmetId",
-     *                   type="integer",
-     *                   description="ID del casco equipaggiato dal giocatore",
-     *                   example=1
-     *                ),
-     *                @OA\Property(
-     *                   property="runeId",
-     *                  type="integer",
-     *                  description="ID della runa equipaggiata dal giocatore",
-     *                  example=2
-     *                ),
-     *                @OA\Property(
-     *                   property="weaponId",
-     *                  type="integer",
-     *                 description="ID dell'arma equipaggiata dal giocatore",
-     *                  example=3
-     *                ),
-     *                @OA\Property(
-     *                   property="currentHealth",
-     *                  type="integer",
-     *                 description="Salute attuale del giocatore",
-     *                  example=10
-     *               )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Giocatore aggiornato con successo",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Player updated successfully"),
-     *             @OA\Property(property="player", type="object", 
-     *                 @OA\Property(property="id", type="integer", example=22),
-     *                 @OA\Property(property="name", type="string", example="john doe"),
-     *                 @OA\Property(property="level", type="integer", example=10),
-     *                 @OA\Property(property="experienceCollected", type="integer", example=1000),
-     *                 @OA\Property(property="nWonBattles", type="integer", example=50),
-     *                 @OA\Property(property="nBattles", type="integer", example=75),
-     *                 @OA\Property(property="currentHealth", type="integer", example=10),
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Giocatore non trovato",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Player not found")
-     *         )
-     *     )
-     * )
-     */
+ * @OA\Put(
+ *     path="/api/player/{id}",
+ *     summary="Update a player",
+ *     description="Updates an existing player by ID. Validates equipment ownership and ensures values are within bounds.",
+ *     operationId="updatePlayer",
+ *     tags={"Player"},
+ *     
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         description="ID of the player to update",
+ *         @OA\Schema(type="integer")
+ *     ),
+ *     
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             @OA\Property(property="name", type="string", maxLength=255, example="PlayerName"),
+ *             @OA\Property(property="level", type="integer", minimum=1, example=5),
+ *             @OA\Property(property="experienceCollected", type="integer", minimum=0, example=1200),
+ *             @OA\Property(property="nWonBattles", type="integer", minimum=0, example=10),
+ *             @OA\Property(property="nBattles", type="integer", minimum=0, example=15),
+ *             @OA\Property(property="helmetId", type="integer", example=1),
+ *             @OA\Property(property="runeId", type="integer", example=2),
+ *             @OA\Property(property="weaponId", type="integer", example=3),
+ *             @OA\Property(property="currentHealth", type="integer", minimum=0, example=80),
+ *             @OA\Property(property="maxHealth", type="integer", minimum=0, example=100),
+ *             @OA\Property(property="maxLevel", type="integer", minimum=0, example=100)
+ *         )
+ *     ),
+ *     
+ *     @OA\Response(
+ *         response=200,
+ *         description="Player updated successfully",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Player updated successfully"),
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=400,
+ *         description="Invalid input or equipment already owned",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Helmet already owned by another player or the item is not an helmet")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Player not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Player not found")
+ *         )
+ *     )
+ * )
+ */
     public function update(Request $request, $id): \Illuminate\Http\JsonResponse
     {
 
@@ -297,6 +251,9 @@ class PlayerController extends Controller
             "runeId" => "integer|exists:equippableItems,id",
             "weaponId" => "integer|exists:equippableItems,id",
             "currentHealth" => "integer|min:0",
+            "maxLevel" => "integer|min:0",
+            "currentHealth" => "integer|min:0",
+            "maxHealth" => "integer|min:0",
         ]);
 
         // get the helmet,rune and weapon and checks that they are not already owned by another player
@@ -335,6 +292,9 @@ class PlayerController extends Controller
             "runeId" => $request->runeId ?? $player->runeId,
             "weaponId" => $request->weaponId ?? $player->weaponId,
             "currentHealth" => $request->currentHealth ?? $player->currentHealth,
+            "maxHealth" => $request->maxHealth ?? $player->maxHealth,
+            "currentHealth" => $request->currentHealth ?? $player->currentHealth,
+            "maxHealth" => $request->maxHealth ?? $player->maxHealth,
         ]);
 
         return response()->json([

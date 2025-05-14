@@ -976,13 +976,13 @@
                     "Player"
                 ],
                 "summary": "Update a player",
-                "description": "Aggiorna le informazioni di un giocatore esistente, come nome, livello, esperienza raccolta, vittorie e battaglie totali.",
-                "operationId": "2bee51cc75979ae669cc1b18558f0986",
+                "description": "Updates an existing player by ID. Validates equipment ownership and ensures values are within bounds.",
+                "operationId": "updatePlayer",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "ID del giocatore da aggiornare",
+                        "description": "ID of the player to update",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -994,54 +994,58 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "required": [
-                                    "name"
-                                ],
                                 "properties": {
                                     "name": {
-                                        "description": "Nuovo nome del giocatore",
                                         "type": "string",
-                                        "example": "john doe"
+                                        "maxLength": 255,
+                                        "example": "PlayerName"
                                     },
                                     "level": {
-                                        "description": "Nuovo livello del giocatore",
                                         "type": "integer",
-                                        "example": 10
+                                        "minimum": 1,
+                                        "example": 5
                                     },
                                     "experienceCollected": {
-                                        "description": "Esperienza raccolta dal giocatore",
                                         "type": "integer",
-                                        "example": 1000
+                                        "minimum": 0,
+                                        "example": 1200
                                     },
                                     "nWonBattles": {
-                                        "description": "Numero di battaglie vinte dal giocatore",
                                         "type": "integer",
-                                        "example": 50
+                                        "minimum": 0,
+                                        "example": 10
                                     },
                                     "nBattles": {
-                                        "description": "Numero totale di battaglie del giocatore",
                                         "type": "integer",
-                                        "example": 75
+                                        "minimum": 0,
+                                        "example": 15
                                     },
                                     "helmetId": {
-                                        "description": "ID del casco equipaggiato dal giocatore",
                                         "type": "integer",
                                         "example": 1
                                     },
                                     "runeId": {
-                                        "description": "ID della runa equipaggiata dal giocatore",
                                         "type": "integer",
                                         "example": 2
                                     },
                                     "weaponId": {
-                                        "description": "ID dell'arma equipaggiata dal giocatore",
                                         "type": "integer",
                                         "example": 3
                                     },
                                     "currentHealth": {
-                                        "description": "Salute attuale del giocatore",
                                         "type": "integer",
-                                        "example": 10
+                                        "minimum": 0,
+                                        "example": 80
+                                    },
+                                    "maxHealth": {
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "example": 100
+                                    },
+                                    "maxLevel": {
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "example": 100
                                     }
                                 },
                                 "type": "object"
@@ -1051,7 +1055,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Giocatore aggiornato con successo",
+                        "description": "Player updated successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1059,39 +1063,22 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Player updated successfully"
-                                        },
-                                        "player": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 22
-                                                },
-                                                "name": {
-                                                    "type": "string",
-                                                    "example": "john doe"
-                                                },
-                                                "level": {
-                                                    "type": "integer",
-                                                    "example": 10
-                                                },
-                                                "experienceCollected": {
-                                                    "type": "integer",
-                                                    "example": 1000
-                                                },
-                                                "nWonBattles": {
-                                                    "type": "integer",
-                                                    "example": 50
-                                                },
-                                                "nBattles": {
-                                                    "type": "integer",
-                                                    "example": 75
-                                                },
-                                                "currentHealth": {
-                                                    "type": "integer",
-                                                    "example": 10
-                                                }
-                                            },
-                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input or equipment already owned",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Helmet already owned by another player or the item is not an helmet"
                                         }
                                     },
                                     "type": "object"
@@ -1100,7 +1087,7 @@
                         }
                     },
                     "404": {
-                        "description": "Giocatore non trovato",
+                        "description": "Player not found",
                         "content": {
                             "application/json": {
                                 "schema": {
