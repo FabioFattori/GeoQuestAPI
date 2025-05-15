@@ -135,15 +135,13 @@ class LeagueController extends Controller
         if(
             !isset($league) 
         ){
-            League::create([
+            $league = League::create([
                 'playerId' => $request->playerId
             ]);
-            
-            return response()->json(
-                [
-                    'message' => 'Player cannot have the reward'
-                ],414
-            );
+
+    // Imposta updated_at a 7 giorni fa per consentire la ricezione della ricompensa
+    $league->updated_at = now()->subDays(7);
+    $league->save();
         }
 
         if($this->isInThisWeek($league->updated_at)){

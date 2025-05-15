@@ -136,6 +136,18 @@ class DatabaseSeeder extends Seeder
         ];
 
         DB::table('players')->insert($players);
+
+        $user = [
+            [
+                'email' => 'p@p.com',
+                'password' => bcrypt('password'),
+                'playerId' => 1,
+                ]
+
+            ];
+
+        DB::table('users')->insert($user);
+
         
     }
 }
